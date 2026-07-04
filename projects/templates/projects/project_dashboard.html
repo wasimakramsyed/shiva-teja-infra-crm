@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h2>{{ project.project_name }}</h2>
+
+<div class="row mb-4">
+
+    <div class="col-md-3">
+        <div class="card shadow-sm p-3">
+            <h5>Available Plots</h5>
+            <h2>{{ available_plots }}</h2>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card shadow-sm p-3">
+            <h5>Booked Plots</h5>
+            <h2>{{ booked_plots }}</h2>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card shadow-sm p-3">
+            <h5>Registered Plots</h5>
+            <h2>{{ registered_plots }}</h2>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card shadow-sm p-3">
+            <h5>Revenue</h5>
+            <h2>₹{{ revenue }}</h2>
+        </div>
+    </div>
+
+</div>
+
+<div class="card shadow-sm p-3 mb-4">
+    <h5>Outstanding</h5>
+    <h2>₹{{ outstanding }}</h2>
+</div>
+
+<hr>
+
+<h4>Project Details</h4>
+
+<p><strong>Project ID:</strong> {{ project.project_id }}</p>
+<p><strong>Location:</strong> {{ project.location }}</p>
+<p><strong>Description:</strong> {{ project.description }}</p>
+<p><strong>Total Plots:</strong> {{ project.total_plots }}</p>
+<p><strong>Project Value:</strong> ₹{{ project.project_value }}</p>
+
+<hr>
+
+<a href="/projects/plots/create/" class="btn btn-primary">
+    Add Plot
+</a>
+
+{% endblock %}
