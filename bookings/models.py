@@ -1,6 +1,6 @@
 from django.db import models
 from django.core.exceptions import ValidationError
-from customers.models import Customer
+from leads.models import Lead
 from projects.models import Project, Plot
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -9,23 +9,27 @@ from django.dispatch import receiver
 class Booking(models.Model):
     STATUS_CHOICES = [
         ('booked', 'Booked'),
+        ('partially_paid', 'Partially Paid'),
+        ('fully_paid', 'Fully Paid'),
         ('cancelled', 'Cancelled'),
-        ('completed', 'Completed'),
         ('registered', 'Registered'),
     ]
 
     booking_id = models.CharField(
         max_length=20,
-        unique=True
+        unique=True,
+        blank=True
     )
 
     booking_date = models.DateField()
 
-    customer = models.ForeignKey(
-        Customer,
-        on_delete=models.CASCADE,
-        related_name='bookings'
-    )
+    lead = models.ForeignKey(
+    Lead,
+    on_delete=models.CASCADE,
+    related_name='bookings',
+    null=True,
+    blank=True
+)
 
     project = models.ForeignKey(
         Project,
@@ -37,9 +41,34 @@ class Booking(models.Model):
         on_delete=models.CASCADE
     )
 
+    booked_client_name = models.CharField(
+    max_length=150,
+    null=True,
+    blank=True
+)
+
+    mobile_number = models.CharField(
+    max_length=15,
+    null=True,
+    blank=True
+)
+
     booking_amount = models.DecimalField(
         max_digits=15,
         decimal_places=2
+    )
+
+    advance_amount = models.DecimalField(
+        max_digits=15,
+        decimal_places=2,
+        default=0
+    )
+
+    pending_amount = models.DecimalField(
+        max_digits=15,
+        decimal_places=2,
+        blank=True,
+        null=True
     )
 
     payment_mode = models.CharField(
@@ -96,7 +125,31 @@ class Booking(models.Model):
         auto_now_add=True
     )
 
-    # NEW VALIDATION
+    def save(self, *args, **kwargs):
+        if not self.booking_id:
+            last_booking = Booking.objects.order_by(
+                '-id'
+            ).first()
+
+            if last_booking:
+                last_id = int(
+                    last_booking.booking_id.replace(
+                        'BOOK',
+                        ''
+                    )
+                )
+                new_id = last_id + 1
+            else:
+                new_id = 1
+
+            self.booking_id = f"BOOK{new_id:03d}"
+
+        self.pending_amount = (
+            self.booking_amount - self.advance_amount
+        )
+
+        super().save(*args, **kwargs)
+
     def clean(self):
         if self.plot.status != 'available':
             raise ValidationError(

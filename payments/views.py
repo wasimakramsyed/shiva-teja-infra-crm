@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.core.exceptions import ValidationError
 from .models import Payment
 from .forms import PaymentForm
@@ -13,13 +13,11 @@ def payment_list(request):
 
     payments = Payment.objects.all()
 
-    # Search by payment ID
     if query:
         payments = payments.filter(
             payment_id__icontains=query
         )
 
-    # Filter by payment status
     if status_filter:
         payments = payments.filter(
             status=status_filter
@@ -38,7 +36,10 @@ def payment_list(request):
 
 @role_required(['accounts'])
 def create_payment(request):
-    form = PaymentForm(request.POST or None)
+    form = PaymentForm(
+        request.POST or None,
+        request.FILES or None
+    )
 
     if form.is_valid():
         try:
@@ -47,7 +48,10 @@ def create_payment(request):
             payment.save()
 
             Notification.objects.create(
-                message="Payment received"
+                message=(
+                    f"Payment received: "
+                    f"{payment.payment_id}"
+                )
             )
 
             return redirect('/payments/')
@@ -58,5 +62,49 @@ def create_payment(request):
     return render(
         request,
         'payments/create_payment.html',
-        {'form': form}
+        {
+            'form': form
+        }
+    )
+
+
+@role_required(['admin', 'accounts'])
+def payment_profile(request, payment_id):
+    payment = get_object_or_404(
+        Payment,
+        id=payment_id
+    )
+
+    return render(
+        request,
+        'payments/payment_profile.html',
+        {
+            'payment': payment
+        }
+    )
+
+
+@role_required(['accounts'])
+def edit_payment(request, payment_id):
+    payment = get_object_or_404(
+        Payment,
+        id=payment_id
+    )
+
+    form = PaymentForm(
+        request.POST or None,
+        request.FILES or None,
+        instance=payment
+    )
+
+    if form.is_valid():
+        form.save()
+        return redirect('/payments/')
+
+    return render(
+        request,
+        'payments/create_payment.html',
+        {
+            'form': form
+        }
     )

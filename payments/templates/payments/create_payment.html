@@ -4,22 +4,14 @@
 
 <h2 class="mb-4">Create Payment</h2>
 
-<div class="card shadow-sm">
-    <div class="card-body">
+<form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
 
-        <form method="POST">
-            {% csrf_token %}
-            {{ form.as_p }}
+    {{ form.as_p }}
 
-            <button
-                type="submit"
-                class="btn btn-success"
-            >
-                Save Payment
-            </button>
-        </form>
-
-    </div>
-</div>
+    <button type="submit" class="btn btn-success">
+        Save Payment
+    </button>
+</form>
 
 {% endblock %}

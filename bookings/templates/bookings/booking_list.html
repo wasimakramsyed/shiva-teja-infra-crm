@@ -7,29 +7,33 @@
 <form method="GET" class="mb-4">
     <div class="row">
 
-        <div class="col-md-4">
+        <div class="col-md-6">
             <input
                 type="text"
                 name="q"
-                class="form-control"
-                placeholder="Search booking ID"
+                placeholder="Search Booked Client"
                 value="{{ query }}"
+                class="form-control"
             >
         </div>
 
         <div class="col-md-4">
-            <select name="status" class="form-control">
-                <option value="">All</option>
+            <select
+                name="status"
+                class="form-control"
+            >
+                <option value="">Filter by Status</option>
                 <option value="booked">Booked</option>
-                <option value="completed">Completed</option>
+                <option value="partially_paid">Partially Paid</option>
+                <option value="fully_paid">Fully Paid</option>
                 <option value="registered">Registered</option>
                 <option value="cancelled">Cancelled</option>
             </select>
         </div>
 
         <div class="col-md-2">
-            <button class="btn btn-primary">
-                Search
+            <button class="btn btn-primary w-100">
+                Filter
             </button>
         </div>
 
@@ -40,44 +44,43 @@
     Create Booking
 </a>
 
-<div class="card shadow-sm">
-    <div class="card-body">
+<table class="table table-bordered">
 
-        <table class="table table-bordered table-hover">
+    <thead>
+        <tr>
+            <th>Booking ID</th>
+            <th>Booked Client</th>
+            <th>Project</th>
+            <th>Plot</th>
+            <th>Booking Amount</th>
+            <th>Pending Amount</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
 
-            <thead>
-                <tr>
-                    <th>Booking ID</th>
-                    <th>Customer</th>
-                    <th>Project</th>
-                    <th>Plot</th>
-                    <th>Amount</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
+    <tbody>
+        {% for booking in bookings %}
+        <tr>
+            <td>{{ booking.booking_id }}</td>
+            <td>{{ booking.booked_client_name }}</td>
+            <td>{{ booking.project.project_name }}</td>
+            <td>{{ booking.plot.plot_number }}</td>
+            <td>₹{{ booking.booking_amount }}</td>
+            <td>₹{{ booking.pending_amount }}</td>
+            <td>{{ booking.status }}</td>
+            <td>
+                <a href="/bookings/{{ booking.id }}/">View</a> |
+                <a href="/bookings/edit/{{ booking.id }}/">Edit</a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="8">No bookings found</td>
+        </tr>
+        {% endfor %}
+    </tbody>
 
-            <tbody>
-                {% for booking in bookings %}
-                    <tr>
-                        <td>{{ booking.booking_id }}</td>
-                        <td>{{ booking.customer.customer_name }}</td>
-                        <td>{{ booking.project.project_name }}</td>
-                        <td>{{ booking.plot.plot_number }}</td>
-                        <td>₹{{ booking.booking_amount }}</td>
-                        <td>{{ booking.status }}</td>
-                    </tr>
-                {% empty %}
-                    <tr>
-                        <td colspan="6">
-                            No bookings found.
-                        </td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-
-        </table>
-
-    </div>
-</div>
+</table>
 
 {% endblock %}
