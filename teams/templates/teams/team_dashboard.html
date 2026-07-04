@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h2>{{ team.team_name }}</h2>
+
+<div class="card shadow-sm p-4 mb-4">
+
+    <p><strong>Team ID:</strong> {{ team.team_id }}</p>
+
+    <p>
+        <strong>Team Head:</strong>
+        {{ team.team_head.first_name }}
+        {{ team.team_head.surname }}
+        ({{ team.team_head.designation }})
+    </p>
+
+    <p><strong>Status:</strong> {{ team.status }}</p>
+
+    <p><strong>Description:</strong> {{ team.description }}</p>
+
+    <p><strong>Total Members:</strong> {{ members_count }}</p>
+
+</div>
+
+<h4>Team Members</h4>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Employee ID</th>
+            <th>Name</th>
+            <th>Designation</th>
+            <th>Mobile</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for member in team.members.all %}
+        <tr>
+            <td>{{ member.employee_id }}</td>
+            <td>{{ member.first_name }} {{ member.surname }}</td>
+            <td>{{ member.get_designation_display }}</td>
+            <td>{{ member.mobile_number }}</td>
+            <td>{{ member.status }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="5">No members assigned</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

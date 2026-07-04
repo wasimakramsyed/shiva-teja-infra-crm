@@ -10,6 +10,7 @@ urlpatterns = [
     path('', include('dashboard.urls')),
     path('', include('accounts.urls')),
     path('', include('employees.urls')),
+    path('', include('teams.urls')),
     path('', include('leads.urls')),
     path('', include('customers.urls')),
     path('', include('bookings.urls')),

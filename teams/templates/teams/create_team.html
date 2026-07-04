@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h2 class="mb-4">Create Team</h2>
+
+<form method="POST">
+    {% csrf_token %}
+
+    <!-- Team Name -->
+    <div class="mb-3">
+        <label>Team Name</label>
+        {{ form.team_name }}
+    </div>
+
+    <!-- Team Head -->
+    <div class="mb-3">
+        <label>Select Team Head</label>
+        {{ form.team_head }}
+    </div>
+
+    <!-- Team Members -->
+    <div class="mb-3">
+        <label>Select Team Members</label>
+
+        <div class="border p-3 rounded">
+            {{ form.members }}
+        </div>
+    </div>
+
+    <!-- Description -->
+    <div class="mb-3">
+        <label>Description</label>
+        {{ form.description }}
+    </div>
+
+    <!-- Status -->
+    <div class="mb-3">
+        <label>Status</label>
+        {{ form.status }}
+    </div>
+
+    <button type="submit" class="btn btn-success">
+        Save Team
+    </button>
+
+</form>
+
+{% endblock %}
