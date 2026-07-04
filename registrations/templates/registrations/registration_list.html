@@ -1,0 +1,16 @@
+<h1>Registrations List</h1>
+
+<a href="/registrations/create/">
+    Create Registration
+</a>
+
+<ul>
+    {% for registration in registrations %}
+        <li>
+            {{ registration.registration_id }} -
+            {{ registration.booking.booking_id }}
+        </li>
+    {% empty %}
+        <li>No registrations found.</li>
+    {% endfor %}
+</ul>

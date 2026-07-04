@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h1>Leads List</h1>
+
+<form method="GET" class="mb-3">
+    <input type="text" name="q" class="form-control" placeholder="Search leads">
+</form>
+
+<a href="/leads/create/" class="btn btn-primary mb-3">
+    Create Lead
+</a>
+
+<ul class="list-group">
+    {% for lead in leads %}
+        <li class="list-group-item">
+            {{ lead.lead_name }} - {{ lead.status }}
+
+            <a href="/leads/convert/{{ lead.id }}/"
+               class="btn btn-success btn-sm float-end">
+                Convert
+            </a>
+        </li>
+    {% empty %}
+        <li class="list-group-item">
+            No leads found.
+        </li>
+    {% endfor %}
+</ul>
+
+{% endblock %}

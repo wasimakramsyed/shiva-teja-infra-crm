@@ -1,5 +1,6 @@
 from django.db import models
 from leads.models import Lead
+from employees.models import Employee
 
 
 class Customer(models.Model):
@@ -15,6 +16,13 @@ class Customer(models.Model):
     email = models.EmailField(blank=True, null=True)
 
     address = models.TextField()
+
+    assigned_to = models.ForeignKey(
+        Employee,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
+    )
 
     aadhaar = models.FileField(upload_to='customer_docs/', blank=True, null=True)
     pan = models.FileField(upload_to='customer_docs/', blank=True, null=True)

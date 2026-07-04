@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.exceptions import ValidationError
 from customers.models import Customer
 from projects.models import Project, Plot
 from django.db.models.signals import post_save
@@ -13,7 +14,11 @@ class Booking(models.Model):
         ('registered', 'Registered'),
     ]
 
-    booking_id = models.CharField(max_length=20, unique=True)
+    booking_id = models.CharField(
+        max_length=20,
+        unique=True
+    )
+
     booking_date = models.DateField()
 
     customer = models.ForeignKey(
@@ -32,13 +37,30 @@ class Booking(models.Model):
         on_delete=models.CASCADE
     )
 
-    booking_amount = models.DecimalField(max_digits=15, decimal_places=2)
+    booking_amount = models.DecimalField(
+        max_digits=15,
+        decimal_places=2
+    )
 
-    payment_mode = models.CharField(max_length=50)
-    reference_number = models.CharField(max_length=100, blank=True, null=True)
+    payment_mode = models.CharField(
+        max_length=50
+    )
 
-    booking_remarks = models.TextField(blank=True, null=True)
-    special_instructions = models.TextField(blank=True, null=True)
+    reference_number = models.CharField(
+        max_length=100,
+        blank=True,
+        null=True
+    )
+
+    booking_remarks = models.TextField(
+        blank=True,
+        null=True
+    )
+
+    special_instructions = models.TextField(
+        blank=True,
+        null=True
+    )
 
     status = models.CharField(
         max_length=20,
@@ -46,12 +68,40 @@ class Booking(models.Model):
         default='booked'
     )
 
-    booking_form = models.FileField(upload_to='booking_docs/', blank=True, null=True)
-    customer_photo = models.ImageField(upload_to='booking_docs/', blank=True, null=True)
-    aadhaar = models.FileField(upload_to='booking_docs/', blank=True, null=True)
-    pan = models.FileField(upload_to='booking_docs/', blank=True, null=True)
+    booking_form = models.FileField(
+        upload_to='booking_docs/',
+        blank=True,
+        null=True
+    )
 
-    created_at = models.DateTimeField(auto_now_add=True)
+    customer_photo = models.ImageField(
+        upload_to='booking_docs/',
+        blank=True,
+        null=True
+    )
+
+    aadhaar = models.FileField(
+        upload_to='booking_docs/',
+        blank=True,
+        null=True
+    )
+
+    pan = models.FileField(
+        upload_to='booking_docs/',
+        blank=True,
+        null=True
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    # NEW VALIDATION
+    def clean(self):
+        if self.plot.status != 'available':
+            raise ValidationError(
+                "This plot is already booked or registered."
+            )
 
     def __str__(self):
         return self.booking_id
@@ -59,6 +109,6 @@ class Booking(models.Model):
 
 @receiver(post_save, sender=Booking)
 def update_plot_status(sender, instance, created, **kwargs):
-    if created:
+    if created and instance.plot.status != 'booked':
         instance.plot.status = 'booked'
         instance.plot.save()

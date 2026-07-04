@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h2 class="mb-4">Customers List</h2>
+
+<form method="GET" class="mb-4">
+    <div class="row">
+        <div class="col-md-6">
+            <input
+                type="text"
+                name="q"
+                class="form-control"
+                placeholder="Search customers"
+                value="{{ query }}"
+            >
+        </div>
+
+        <div class="col-md-2">
+            <button class="btn btn-primary">
+                Search
+            </button>
+        </div>
+    </div>
+</form>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+
+        <table class="table table-bordered table-hover">
+
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Mobile</th>
+                    <th>Email</th>
+                    <th>Address</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for customer in customers %}
+                    <tr>
+                        <td>{{ customer.customer_name }}</td>
+                        <td>{{ customer.mobile_number }}</td>
+                        <td>{{ customer.email }}</td>
+                        <td>{{ customer.address }}</td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="4">
+                            No customers found.
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+
+        </table>
+
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h2 class="mb-4">Create Lead</h2>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+
+        <form method="POST">
+            {% csrf_token %}
+            {{ form.as_p }}
+
+            <button
+                type="submit"
+                class="btn btn-success"
+            >
+                Save Lead
+            </button>
+        </form>
+
+    </div>
+</div>
+
+{% endblock %}

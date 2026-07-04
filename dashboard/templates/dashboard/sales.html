@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h2 class="mb-4">Sales Dashboard</h2>
+
+<div class="row">
+
+    <div class="col-md-3 mb-3">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5>My Leads</h5>
+                <h2>{{ my_leads_count }}</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3 mb-3">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5>My Customers</h5>
+                <h2>{{ my_customers_count }}</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3 mb-3">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5>My Bookings</h5>
+                <h2>{{ my_bookings_count }}</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3 mb-3">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5>My Revenue</h5>
+                <h2>₹{{ my_revenue }}</h2>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<hr>
+
+<div class="row">
+
+    <div class="col-md-6">
+        <div class="card shadow-sm p-3 mb-3">
+            <h5>Recent Leads</h5>
+
+            <ul>
+                {% for lead in recent_leads %}
+                    <li>{{ lead.lead_name }}</li>
+                {% empty %}
+                    <li>No leads</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card shadow-sm p-3 mb-3">
+            <h5>Recent Bookings</h5>
+
+            <ul>
+                {% for booking in recent_bookings %}
+                    <li>{{ booking.booking_id }}</li>
+                {% empty %}
+                    <li>No bookings</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

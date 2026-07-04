@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h2>Employee Profile</h2>
+
+<div class="card p-4 shadow-sm">
+
+    <p><strong>Employee ID:</strong> {{ employee.employee_id }}</p>
+    <p><strong>Name:</strong> {{ employee.first_name }} {{ employee.surname }}</p>
+    <p><strong>Father/Spouse:</strong> {{ employee.father_spouse_name }}</p>
+    <p><strong>Mobile:</strong> {{ employee.mobile_number }}</p>
+    <p><strong>Emergency Contact:</strong> {{ employee.emergency_contact }}</p>
+    <p><strong>Email:</strong> {{ employee.email }}</p>
+    <p><strong>Address:</strong> {{ employee.address }}</p>
+    <p><strong>Designation:</strong> {{ employee.get_designation_display }}</p>
+    <p><strong>Status:</strong> {{ employee.status }}</p>
+
+    <p>
+        <strong>Reporting To:</strong>
+        {% if employee.reporting_to %}
+            {{ employee.reporting_to.first_name }}
+        {% else %}
+            None
+        {% endif %}
+    </p>
+
+    <p><strong>Joining Date:</strong> {{ employee.joining_date }}</p>
+
+    <hr>
+
+    <h5>Documents</h5>
+
+    {% if employee.aadhaar %}
+        <p><a href="{{ employee.aadhaar.url }}">Aadhaar</a></p>
+    {% endif %}
+
+    {% if employee.pan %}
+        <p><a href="{{ employee.pan.url }}">PAN</a></p>
+    {% endif %}
+
+    {% if employee.passbook %}
+        <p><a href="{{ employee.passbook.url }}">Passbook</a></p>
+    {% endif %}
+
+    {% if employee.photo %}
+        <img
+            src="{{ employee.photo.url }}"
+            width="150"
+            class="img-thumbnail"
+        >
+    {% endif %}
+
+</div>
+
+{% endblock %}
