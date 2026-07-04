@@ -1,40 +1,95 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Lead
 from .forms import LeadForm
-from accounts.decorators import role_required
 from customers.models import Customer
-from notifications.models import Notification
+from accounts.decorators import role_required
 
 
 @role_required(['admin', 'manager', 'sales'])
 def lead_list(request):
+    query = request.GET.get('q')
+    status_filter = request.GET.get('status')
+
     leads = Lead.objects.all()
+
+    if query:
+        leads = leads.filter(
+            lead_name__icontains=query
+        )
+
+    if status_filter:
+        leads = leads.filter(
+            status=status_filter
+        )
 
     return render(
         request,
         'leads/lead_list.html',
-        {'leads': leads}
+        {
+            'leads': leads,
+            'query': query,
+            'status_filter': status_filter
+        }
     )
 
 
-@role_required(['sales'])
+@role_required(['sales', 'admin'])
 def create_lead(request):
-    form = LeadForm(request.POST or None)
+    form = LeadForm(
+        request.POST or None
+    )
 
     if form.is_valid():
         form.save()
-
-        # Create Notification
-        Notification.objects.create(
-            message="New lead created"
-        )
-
         return redirect('/leads/')
 
     return render(
         request,
         'leads/create_lead.html',
-        {'form': form}
+        {
+            'form': form
+        }
+    )
+
+
+@role_required(['admin', 'manager', 'sales'])
+def lead_profile(request, lead_id):
+    lead = get_object_or_404(
+        Lead,
+        id=lead_id
+    )
+
+    return render(
+        request,
+        'leads/lead_profile.html',
+        {
+            'lead': lead
+        }
+    )
+
+
+@role_required(['admin', 'sales'])
+def edit_lead(request, lead_id):
+    lead = get_object_or_404(
+        Lead,
+        id=lead_id
+    )
+
+    form = LeadForm(
+        request.POST or None,
+        instance=lead
+    )
+
+    if form.is_valid():
+        form.save()
+        return redirect('/leads/')
+
+    return render(
+        request,
+        'leads/create_lead.html',
+        {
+            'form': form
+        }
     )
 
 
@@ -45,7 +100,6 @@ def convert_lead(request, lead_id):
         id=lead_id
     )
 
-    # Prevent duplicate conversion
     if hasattr(lead, 'customer'):
         return redirect('/leads/')
 
@@ -55,15 +109,10 @@ def convert_lead(request, lead_id):
         mobile_number=lead.mobile_number,
         email=lead.email,
         address=lead.address,
-        assigned_to=lead.assigned_to
+        assigned_to=lead.assigned_employee
     )
 
     lead.status = 'converted'
     lead.save()
-
-    # Create Notification
-    Notification.objects.create(
-        message=f"Lead {lead.lead_name} converted to customer"
-    )
 
     return redirect('/leads/')

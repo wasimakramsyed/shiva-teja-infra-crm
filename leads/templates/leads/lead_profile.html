@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h2>Lead Profile</h2>
+
+<div class="card shadow-sm p-4">
+
+    <p><strong>Lead ID:</strong> {{ lead.lead_id }}</p>
+    <p><strong>Name:</strong> {{ lead.lead_name }}</p>
+    <p><strong>Mobile:</strong> {{ lead.mobile_number }}</p>
+    <p><strong>Email:</strong> {{ lead.email }}</p>
+    <p><strong>Address:</strong> {{ lead.address }}</p>
+    <p><strong>Source:</strong> {{ lead.source }}</p>
+
+    <p>
+        <strong>Project:</strong>
+        {% if lead.project %}
+            {{ lead.project.project_name }}
+        {% else %}
+            Not Assigned
+        {% endif %}
+    </p>
+
+    <p>
+        <strong>Assigned Employee:</strong>
+        {{ lead.assigned_employee.first_name }}
+        {{ lead.assigned_employee.surname }}
+    </p>
+
+    <p>
+        <strong>Assigned Team:</strong>
+        {% if lead.assigned_team %}
+            {{ lead.assigned_team.team_name }}
+        {% else %}
+            Not Assigned
+        {% endif %}
+    </p>
+
+    <p><strong>Priority:</strong> {{ lead.priority }}</p>
+    <p><strong>Follow-Up Date:</strong> {{ lead.follow_up_date }}</p>
+    <p><strong>Next Follow-Up:</strong> {{ lead.next_follow_up }}</p>
+    <p><strong>Status:</strong> {{ lead.status }}</p>
+    <p><strong>Remarks:</strong> {{ lead.remarks }}</p>
+
+</div>
+
+{% endblock %}
