@@ -1,6 +1,9 @@
 {% extends 'base.html' %}
 
 {% block content %}
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
 <h2 class="mb-4">Create Team</h2>
 
@@ -27,6 +30,15 @@
             {{ form.members }}
         </div>
     </div>
+
+    <script>
+    $(document).ready(function () {
+       $('#id_members').select2({
+           placeholder: "Select Team Members",
+           width: '100%'
+        });
+    });
+    </script>
 
     <!-- Description -->
     <div class="mb-3">
