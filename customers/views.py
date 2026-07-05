@@ -3,14 +3,13 @@ from .models import Customer
 from .forms import CustomerForm
 from accounts.decorators import role_required
 from notifications.models import Notification
+from commissions.models import Commission
 
 
 @role_required(['admin', 'manager', 'sales'])
 def customer_list(request):
     query = request.GET.get('q')
-    ownership_filter = request.GET.get(
-        'ownership_status'
-    )
+    ownership_filter = request.GET.get('ownership_status')
 
     customers = Customer.objects.all()
 
@@ -72,12 +71,17 @@ def customer_profile(request, customer_id):
 
     payments = customer.booking.payments.all()
 
+    commissions = Commission.objects.filter(
+        payment__booking=customer.booking
+    )
+
     return render(
         request,
         'customers/customer_profile.html',
         {
             'customer': customer,
-            'payments': payments
+            'payments': payments,
+            'commissions': commissions
         }
     )
 
@@ -97,6 +101,14 @@ def edit_customer(request, customer_id):
 
     if form.is_valid():
         form.save()
+
+        Notification.objects.create(
+            message=(
+                f"Customer updated: "
+                f"{customer.customer_id}"
+            )
+        )
+
         return redirect('/customers/')
 
     return render(

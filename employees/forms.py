@@ -24,8 +24,70 @@ class EmployeeForm(forms.ModelForm):
             'bank_account'
         ]
 
+        widgets = {
+            'first_name': forms.TextInput(
+                attrs={'class': 'form-control'}
+            ),
+            'surname': forms.TextInput(
+                attrs={'class': 'form-control'}
+            ),
+            'father_spouse_name': forms.TextInput(
+                attrs={'class': 'form-control'}
+            ),
+            'mobile_number': forms.TextInput(
+                attrs={'class': 'form-control'}
+            ),
+            'emergency_contact': forms.TextInput(
+                attrs={'class': 'form-control'}
+            ),
+            'email': forms.EmailInput(
+                attrs={'class': 'form-control'}
+            ),
+            'address': forms.Textarea(
+                attrs={
+                    'class': 'form-control',
+                    'rows': 4
+                }
+            ),
+            'designation': forms.Select(
+                attrs={'class': 'form-select'}
+            ),
+            'reporting_to': forms.Select(
+                attrs={'class': 'form-select'}
+            ),
+            'joining_date': forms.DateInput(
+                attrs={
+                    'type': 'date',
+                    'class': 'form-control'
+                }
+            ),
+            'status': forms.Select(
+                attrs={'class': 'form-select'}
+            ),
+            'bank_account': forms.TextInput(
+                attrs={'class': 'form-control'}
+            ),
+        }
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+        # File fields styling
+        self.fields['aadhaar'].widget.attrs.update({
+            'class': 'form-control'
+        })
+
+        self.fields['pan'].widget.attrs.update({
+            'class': 'form-control'
+        })
+
+        self.fields['passbook'].widget.attrs.update({
+            'class': 'form-control'
+        })
+
+        self.fields['photo'].widget.attrs.update({
+            'class': 'form-control'
+        })
 
         hierarchy = [
             'SA',

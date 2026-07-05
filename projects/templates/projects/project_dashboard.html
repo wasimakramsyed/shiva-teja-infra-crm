@@ -53,6 +53,81 @@
 
 <hr>
 
+<h4>Plot Details</h4>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Plot Number</th>
+            <th>Size</th>
+            <th>Facing</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for plot in plots %}
+        <tr>
+            <td>{{ plot.plot_number }}</td>
+            <td>{{ plot.plot_size }}</td>
+            <td>{{ plot.facing }}</td>
+            <td>{{ plot.status }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<hr>
+
+<h4>Booked Customers</h4>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Booking ID</th>
+            <th>Name</th>
+            <th>Plot</th>
+            <th>Pending Amount</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for booking in bookings %}
+        <tr>
+            <td>{{ booking.booking_id }}</td>
+            <td>{{ booking.booked_client_name }}</td>
+            <td>{{ booking.plot.plot_number }}</td>
+            <td>₹{{ booking.pending_amount }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<hr>
+
+<h4>Final Customers</h4>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Customer ID</th>
+            <th>Name</th>
+            <th>Plot</th>
+            <th>Ownership</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for customer in customers %}
+        <tr>
+            <td>{{ customer.customer_id }}</td>
+            <td>{{ customer.customer_name }}</td>
+            <td>{{ customer.booking.plot.plot_number }}</td>
+            <td>{{ customer.ownership_status }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<hr>
+
 <a href="/projects/plots/create/" class="btn btn-primary">
     Add Plot
 </a>

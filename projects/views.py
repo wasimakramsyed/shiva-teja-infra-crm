@@ -67,6 +67,8 @@ def create_plot(request):
 
 @role_required(['admin', 'manager'])
 def project_dashboard(request, project_id):
+    from customers.models import Customer
+
     project = get_object_or_404(
         Project,
         id=project_id
@@ -88,6 +90,10 @@ def project_dashboard(request, project_id):
         project=project
     )
 
+    customers = Customer.objects.filter(
+        booking__project=project
+    )
+
     revenue = sum(
         payment.amount
         for payment in Payment.objects.filter(
@@ -96,9 +102,9 @@ def project_dashboard(request, project_id):
     )
 
     outstanding = sum(
-        booking.booking_amount
+        booking.pending_amount
         for booking in bookings
-    ) - revenue
+    )
 
     context = {
         'project': project,
@@ -109,6 +115,7 @@ def project_dashboard(request, project_id):
         'outstanding': outstanding,
         'plots': project.plots.all(),
         'bookings': bookings,
+        'customers': customers,
     }
 
     return render(

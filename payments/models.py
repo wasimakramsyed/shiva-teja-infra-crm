@@ -1,7 +1,6 @@
 from django.db import models
 from bookings.models import Booking
 from customers.models import Customer
-from settings_config.models import CRMSettings
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
@@ -113,23 +112,6 @@ def update_booking_payment(sender, instance, created, **kwargs):
             booking.status = 'fully_paid'
 
         booking.save()
-
-
-@receiver(post_save, sender=Payment)
-def create_commission(sender, instance, created, **kwargs):
-    if created:
-        from commissions.models import Commission
-
-        booking = instance.booking
-        settings = CRMSettings.objects.first()
-
-        if booking.lead and booking.lead.assigned_employee:
-            Commission.objects.create(
-                payment=instance,
-                employee=booking.lead.assigned_employee,
-                commission_percentage=settings.default_commission_percentage,
-                status='pending'
-            )
 
 
 @receiver(post_save, sender=Payment)
