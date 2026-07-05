@@ -17,8 +17,8 @@
             <input
                 type="text"
                 name="q"
-                placeholder="Search by Name / ID / Mobile"
-                value="{{ query }}"
+                placeholder="Search by Name / ID / Mail / Contact"
+                value="{{ query|default:'' }}"
                 class="form-control"
             >
         </div>

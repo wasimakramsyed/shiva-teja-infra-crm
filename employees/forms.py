@@ -129,4 +129,4 @@ class EmployeeForm(forms.ModelForm):
         else:
             self.fields[
                 'reporting_to'
-            ].queryset = Employee.objects.none()
+    ].queryset = Employee.objects.all()

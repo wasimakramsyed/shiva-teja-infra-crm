@@ -2,17 +2,23 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .models import Employee
 from .forms import EmployeeForm
 from accounts.decorators import role_required
+from django.contrib import messages
+from django.db.models import Q
 
 
 @role_required(['admin', 'manager'])
 def employee_list(request):
-    query = request.GET.get('q')
+    query = request.GET.get('q', '').strip()
 
     employees = Employee.objects.all()
 
     if query:
         employees = employees.filter(
-            first_name__icontains=query
+            Q(first_name__icontains=query) |
+            Q(surname__icontains=query) |
+            Q(employee_id__icontains=query) |
+            Q(mobile_number__icontains=query) |
+            Q(email__icontains=query)
         )
 
     return render(
@@ -32,9 +38,21 @@ def create_employee(request):
         request.FILES or None
     )
 
-    if form.is_valid():
-        form.save()
-        return redirect('/employees/')
+    if request.method == 'POST':
+        if form.is_valid():
+            form.save()
+
+            messages.success(
+                request,
+                "Employee created successfully."
+            )
+
+            return redirect('/employees/')
+        else:
+            messages.error(
+                request,
+                "Please correct the errors below."
+            )
 
     return render(
         request,
@@ -74,9 +92,21 @@ def edit_employee(request, employee_id):
         instance=employee
     )
 
-    if form.is_valid():
-        form.save()
-        return redirect('/employees/')
+    if request.method == 'POST':
+        if form.is_valid():
+            form.save()
+
+            messages.success(
+                request,
+                "Employee updated successfully."
+            )
+
+            return redirect('/employees/')
+        else:
+            messages.error(
+                request,
+                "Please correct the errors below."
+            )
 
     return render(
         request,

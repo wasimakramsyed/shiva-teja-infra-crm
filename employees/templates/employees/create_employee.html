@@ -2,73 +2,149 @@
 
 {% block content %}
 
-<div class="card shadow-sm p-4">
+<div class="container mt-4">
 
-    <h2 class="mb-4">Add Employee</h2>
+    <div class="card shadow-lg border-0">
+        <div class="card-body p-4">
 
-    <form method="POST" enctype="multipart/form-data">
-        {% csrf_token %}
+            <h2 class="mb-4 text-primary">
+                Add Employee
+            </h2>
 
-        <div class="row">
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                {% if form.errors %}
+<div class="alert alert-danger">
+    {{ form.errors }}
+</div>
+{% endif %}
+                <!-- Personal Details -->
+                <h4 class="mb-3 border-bottom pb-2">
+                    Personal Details
+                </h4>
 
-            <div class="col-md-6">
-                <h5>Personal Details</h5>
-                {{ form.first_name.label_tag }}
-                {{ form.first_name }}
+                <div class="row">
 
-                {{ form.surname.label_tag }}
-                {{ form.surname }}
+                    <div class="col-md-6 mb-3">
+                        {{ form.first_name.label_tag }}
+                        {{ form.first_name }}
+                    </div>
 
-                {{ form.mobile_number.label_tag }}
-                {{ form.mobile_number }}
+                    <div class="col-md-6 mb-3">
+                        {{ form.surname.label_tag }}
+                        {{ form.surname }}
+                    </div>
 
-                {{ form.email.label_tag }}
-                {{ form.email }}
+                    <div class="col-md-6 mb-3">
+                        {{ form.father_spouse_name.label_tag }}
+                        {{ form.father_spouse_name }}
+                    </div>
 
-                {{ form.address.label_tag }}
-                {{ form.address }}
-            </div>
+                    <div class="col-md-6 mb-3">
+                        {{ form.mobile_number.label_tag }}
+                        {{ form.mobile_number }}
+                    </div>
 
-            <div class="col-md-6">
-                <h5>Job Details</h5>
-                {{ form.designation.label_tag }}
-                {{ form.designation }}
+                    <div class="col-md-6 mb-3">
+                        {{ form.emergency_contact.label_tag }}
+                        {{ form.emergency_contact }}
+                    </div>
 
-                {{ form.status.label_tag }}
-                {{ form.status }}
+                    <div class="col-md-6 mb-3">
+                        {{ form.email.label_tag }}
+                        {{ form.email }}
+                    </div>
 
-                {{ form.joining_date.label_tag }}
-                {{ form.joining_date }}
+                    <div class="col-md-12 mb-3">
+                        {{ form.address.label_tag }}
+                        {{ form.address }}
+                    </div>
 
-                {{ form.salary.label_tag }}
-                {{ form.salary }}
+                </div>
 
-                {{ form.reporting_to.label_tag }}
-                {{ form.reporting_to }}
-            </div>
+                <!-- Job Details -->
+                <h4 class="mb-3 mt-4 border-bottom pb-2">
+                    Job Details
+                </h4>
+
+                <div class="row">
+
+                    <div class="col-md-4 mb-3">
+                        {{ form.designation.label_tag }}
+                        {{ form.designation }}
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        {{ form.reporting_to.label_tag }}
+                        {{ form.reporting_to }}
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        {{ form.joining_date.label_tag }}
+                        {{ form.joining_date }}
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        {{ form.status.label_tag }}
+                        {{ form.status }}
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        {{ form.bank_account.label_tag }}
+                        {{ form.bank_account }}
+                    </div>
+
+                </div>
+
+                <!-- Documents -->
+                <h4 class="mb-3 mt-4 border-bottom pb-2">
+                    Documents
+                </h4>
+
+                <div class="row">
+
+                    <div class="col-md-6 mb-3">
+                        {{ form.photo.label_tag }}
+                        {{ form.photo }}
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        {{ form.aadhaar.label_tag }}
+                        {{ form.aadhaar }}
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        {{ form.pan.label_tag }}
+                        {{ form.pan }}
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        {{ form.passbook.label_tag }}
+                        {{ form.passbook }}
+                    </div>
+
+                </div>
+
+                <div class="mt-4">
+                    <button
+                        type="submit"
+                        class="btn btn-success px-4"
+                    >
+                        Save Employee
+                    </button>
+
+                    <a
+                        href="/employees/"
+                        class="btn btn-secondary px-4"
+                    >
+                        Cancel
+                    </a>
+                </div>
+
+            </form>
 
         </div>
-
-        <hr>
-
-        <h5>Documents</h5>
-
-        {{ form.photo.label_tag }}
-        {{ form.photo }}
-
-        {{ form.aadhaar.label_tag }}
-        {{ form.aadhaar }}
-
-        {{ form.pan.label_tag }}
-        {{ form.pan }}
-
-        <br><br>
-
-        <button type="submit" class="btn btn-success">
-            Save Employee
-        </button>
-
-    </form>
+    </div>
 
 </div>
 
