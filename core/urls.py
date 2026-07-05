@@ -18,6 +18,9 @@ urlpatterns = [
     path('', include('payments.urls')),
     path('', include('registrations.urls')),
     path('', include('reports.urls')),
+    path('', include('commissions.urls')),
+    path('', include('settings_config.urls')),
+    
 ] + static(
     settings.MEDIA_URL,
     document_root=settings.MEDIA_ROOT

@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h2 class="mb-4">Commission List</h2>
+
+<form method="GET" class="mb-4">
+    <div class="row">
+
+        <div class="col-md-6">
+            <input
+                type="text"
+                name="q"
+                placeholder="Search Commission ID"
+                value="{{ query }}"
+                class="form-control"
+            >
+        </div>
+
+        <div class="col-md-4">
+            <select
+                name="status"
+                class="form-control"
+            >
+                <option value="">Filter by Status</option>
+                <option value="pending">Pending</option>
+                <option value="approved">Approved</option>
+                <option value="paid">Paid</option>
+                <option value="hold">Hold</option>
+            </select>
+        </div>
+
+        <div class="col-md-2">
+            <button class="btn btn-primary w-100">
+                Filter
+            </button>
+        </div>
+
+    </div>
+</form>
+
+<a href="/commissions/create/" class="btn btn-success mb-3">
+    Add Commission
+</a>
+
+<table class="table table-bordered">
+
+    <thead>
+        <tr>
+            <th>Commission ID</th>
+            <th>Employee</th>
+            <th>Payment</th>
+            <th>Commission %</th>
+            <th>Net Commission</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for commission in commissions %}
+        <tr>
+            <td>{{ commission.commission_id }}</td>
+            <td>{{ commission.employee.first_name }}</td>
+            <td>{{ commission.payment.payment_id }}</td>
+            <td>{{ commission.commission_percentage }}%</td>
+            <td>₹{{ commission.net_commission }}</td>
+            <td>{{ commission.status }}</td>
+            <td>
+                <a href="/commissions/{{ commission.id }}/">View</a> |
+                <a href="/commissions/edit/{{ commission.id }}/">Edit</a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="7">No commissions found</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+
+</table>
+
+{% endblock %}

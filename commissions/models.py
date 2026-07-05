@@ -1,6 +1,7 @@
 from django.db import models
 from employees.models import Employee
 from payments.models import Payment
+from settings_config.models import CRMSettings
 
 
 class Commission(models.Model):
@@ -8,9 +9,14 @@ class Commission(models.Model):
         ('pending', 'Pending'),
         ('approved', 'Approved'),
         ('paid', 'Paid'),
+        ('hold', 'Hold'),
     ]
 
-    receipt_number = models.CharField(max_length=30, unique=True)
+    commission_id = models.CharField(
+        max_length=20,
+        unique=True,
+        blank=True
+    )
 
     employee = models.ForeignKey(
         Employee,
@@ -24,8 +30,6 @@ class Commission(models.Model):
         related_name='commissions'
     )
 
-    sale_value = models.DecimalField(max_digits=15, decimal_places=2)
-
     commission_percentage = models.DecimalField(
         max_digits=5,
         decimal_places=2
@@ -33,7 +37,9 @@ class Commission(models.Model):
 
     commission_amount = models.DecimalField(
         max_digits=15,
-        decimal_places=2
+        decimal_places=2,
+        blank=True,
+        null=True
     )
 
     tds = models.DecimalField(
@@ -44,7 +50,14 @@ class Commission(models.Model):
 
     net_commission = models.DecimalField(
         max_digits=15,
-        decimal_places=2
+        decimal_places=2,
+        blank=True,
+        null=True
+    )
+
+    remarks = models.TextField(
+        blank=True,
+        null=True
     )
 
     status = models.CharField(
@@ -53,16 +66,53 @@ class Commission(models.Model):
         default='pending'
     )
 
-    created_at = models.DateTimeField(auto_now_add=True)
+    paid_date = models.DateField(
+        blank=True,
+        null=True
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
 
     def save(self, *args, **kwargs):
+        settings = CRMSettings.objects.first()
+
+        if not self.commission_id:
+            last_commission = Commission.objects.order_by(
+                '-id'
+            ).first()
+
+            if last_commission:
+                last_id = int(
+                    last_commission.commission_id.replace(
+                        'COM',
+                        ''
+                    )
+                )
+                new_id = last_id + 1
+            else:
+                new_id = 1
+
+            self.commission_id = f"COM{new_id:03d}"
+
+        # Dynamic commission calculation
         self.commission_amount = (
-            self.sale_value * self.commission_percentage
+            self.payment.amount *
+            self.commission_percentage
         ) / 100
 
-        self.net_commission = self.commission_amount - self.tds
+        # Dynamic TDS from admin settings
+        self.tds = (
+            self.commission_amount *
+            settings.tds_percentage
+        ) / 100
+
+        self.net_commission = (
+            self.commission_amount - self.tds
+        )
 
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return self.receipt_number
+        return self.commission_id

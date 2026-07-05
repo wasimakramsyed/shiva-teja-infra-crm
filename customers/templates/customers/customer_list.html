@@ -6,58 +6,79 @@
 
 <form method="GET" class="mb-4">
     <div class="row">
+
         <div class="col-md-6">
             <input
                 type="text"
                 name="q"
-                class="form-control"
-                placeholder="Search customers"
+                placeholder="Search Customer"
                 value="{{ query }}"
+                class="form-control"
             >
         </div>
 
+        <div class="col-md-4">
+            <select
+                name="ownership_status"
+                class="form-control"
+            >
+                <option value="">Filter by Ownership</option>
+                <option value="active">Active</option>
+                <option value="transferred">Transferred</option>
+                <option value="cancelled">Cancelled</option>
+            </select>
+        </div>
+
         <div class="col-md-2">
-            <button class="btn btn-primary">
-                Search
+            <button class="btn btn-primary w-100">
+                Filter
             </button>
         </div>
+
     </div>
 </form>
 
-<div class="card shadow-sm">
-    <div class="card-body">
+<a href="/customers/create/" class="btn btn-success mb-3">
+    Add Customer
+</a>
 
-        <table class="table table-bordered table-hover">
+<table class="table table-bordered">
 
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Mobile</th>
-                    <th>Email</th>
-                    <th>Address</th>
-                </tr>
-            </thead>
+    <thead>
+        <tr>
+            <th>Customer ID</th>
+            <th>Name</th>
+            <th>Booking</th>
+            <th>Project</th>
+            <th>Plot</th>
+            <th>Registration</th>
+            <th>Ownership</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
 
-            <tbody>
-                {% for customer in customers %}
-                    <tr>
-                        <td>{{ customer.customer_name }}</td>
-                        <td>{{ customer.mobile_number }}</td>
-                        <td>{{ customer.email }}</td>
-                        <td>{{ customer.address }}</td>
-                    </tr>
-                {% empty %}
-                    <tr>
-                        <td colspan="4">
-                            No customers found.
-                        </td>
-                    </tr>
-                {% endfor %}
-            </tbody>
+    <tbody>
+        {% for customer in customers %}
+        <tr>
+            <td>{{ customer.customer_id }}</td>
+            <td>{{ customer.customer_name }}</td>
+            <td>{{ customer.booking.booking_id }}</td>
+            <td>{{ customer.booking.project.project_name }}</td>
+            <td>{{ customer.booking.plot.plot_number }}</td>
+            <td>{{ customer.registration_status }}</td>
+            <td>{{ customer.ownership_status }}</td>
+            <td>
+                <a href="/customers/{{ customer.id }}/">View</a> |
+                <a href="/customers/edit/{{ customer.id }}/">Edit</a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="8">No customers found</td>
+        </tr>
+        {% endfor %}
+    </tbody>
 
-        </table>
-
-    </div>
-</div>
+</table>
 
 {% endblock %}

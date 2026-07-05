@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h2 class="mb-4">CRM Settings</h2>
+
+<div class="card shadow-sm p-4">
+
+    <form method="POST">
+        {% csrf_token %}
+
+        {{ form.as_p }}
+
+        <button
+            type="submit"
+            class="btn btn-success"
+        >
+            Save Settings
+        </button>
+    </form>
+
+</div>
+
+{% endblock %}

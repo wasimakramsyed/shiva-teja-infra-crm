@@ -1,25 +1,27 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect, get_object_or_404
 from .models import Customer
+from .forms import CustomerForm
 from accounts.decorators import role_required
+from notifications.models import Notification
 
 
 @role_required(['admin', 'manager', 'sales'])
 def customer_list(request):
     query = request.GET.get('q')
-    assigned_filter = request.GET.get('assigned_to')
+    ownership_filter = request.GET.get(
+        'ownership_status'
+    )
 
     customers = Customer.objects.all()
 
-    # Search by customer name
     if query:
         customers = customers.filter(
             customer_name__icontains=query
         )
 
-    # Filter by assigned employee
-    if assigned_filter:
+    if ownership_filter:
         customers = customers.filter(
-            assigned_to__id=assigned_filter
+            ownership_status=ownership_filter
         )
 
     return render(
@@ -28,6 +30,79 @@ def customer_list(request):
         {
             'customers': customers,
             'query': query,
-            'assigned_filter': assigned_filter
+            'ownership_filter': ownership_filter
+        }
+    )
+
+
+@role_required(['admin', 'sales'])
+def create_customer(request):
+    form = CustomerForm(
+        request.POST or None,
+        request.FILES or None
+    )
+
+    if form.is_valid():
+        customer = form.save()
+
+        Notification.objects.create(
+            message=(
+                f"Customer created: "
+                f"{customer.customer_id}"
+            )
+        )
+
+        return redirect('/customers/')
+
+    return render(
+        request,
+        'customers/create_customer.html',
+        {
+            'form': form
+        }
+    )
+
+
+@role_required(['admin', 'manager', 'sales'])
+def customer_profile(request, customer_id):
+    customer = get_object_or_404(
+        Customer,
+        id=customer_id
+    )
+
+    payments = customer.booking.payments.all()
+
+    return render(
+        request,
+        'customers/customer_profile.html',
+        {
+            'customer': customer,
+            'payments': payments
+        }
+    )
+
+
+@role_required(['admin', 'sales'])
+def edit_customer(request, customer_id):
+    customer = get_object_or_404(
+        Customer,
+        id=customer_id
+    )
+
+    form = CustomerForm(
+        request.POST or None,
+        request.FILES or None,
+        instance=customer
+    )
+
+    if form.is_valid():
+        form.save()
+        return redirect('/customers/')
+
+    return render(
+        request,
+        'customers/create_customer.html',
+        {
+            'form': form
         }
     )

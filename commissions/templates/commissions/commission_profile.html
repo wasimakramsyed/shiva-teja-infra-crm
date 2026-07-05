@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h2>Commission Profile</h2>
+
+<div class="card shadow-sm p-4">
+
+    <p><strong>Commission ID:</strong> {{ commission.commission_id }}</p>
+    <p><strong>Employee:</strong> {{ commission.employee.first_name }} {{ commission.employee.surname }}</p>
+    <p><strong>Designation:</strong> {{ commission.employee.designation }}</p>
+    <p><strong>Payment ID:</strong> {{ commission.payment.payment_id }}</p>
+    <p><strong>Commission %:</strong> {{ commission.commission_percentage }}%</p>
+    <p><strong>Gross Commission:</strong> ₹{{ commission.commission_amount }}</p>
+    <p><strong>TDS:</strong> ₹{{ commission.tds }}</p>
+    <p><strong>Net Commission:</strong> ₹{{ commission.net_commission }}</p>
+    <p><strong>Status:</strong> {{ commission.status }}</p>
+    <p><strong>Paid Date:</strong> {{ commission.paid_date }}</p>
+    <p><strong>Remarks:</strong> {{ commission.remarks }}</p>
+
+</div>
+
+{% endblock %}

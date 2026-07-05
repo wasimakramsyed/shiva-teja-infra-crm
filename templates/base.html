@@ -15,9 +15,25 @@
         Shiva Teja Infra CRM
     </a>
 
-    <a href="/logout/" class="btn btn-danger">
+    <div class="d-flex gap-2">
+
+    {% if request.user.role == 'admin' %}
+    <a
+        href="/settings/"
+        class="btn btn-warning"
+    >
+        Settings
+    </a>
+    {% endif %}
+
+    <a
+        href="/logout/"
+        class="btn btn-danger"
+    >
         Logout
     </a>
+
+</div>
 </nav>
 
 <div class="container-fluid">

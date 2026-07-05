@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h2>Customer Profile</h2>
+
+<div class="card shadow-sm p-4">
+
+    <p><strong>Customer ID:</strong> {{ customer.customer_id }}</p>
+    <p><strong>Name:</strong> {{ customer.customer_name }}</p>
+    <p><strong>Mobile:</strong> {{ customer.mobile_number }}</p>
+    <p><strong>Email:</strong> {{ customer.email }}</p>
+    <p><strong>Address:</strong> {{ customer.address }}</p>
+
+    <hr>
+
+    <h4>Booking Details</h4>
+
+    <p><strong>Booking ID:</strong> {{ customer.booking.booking_id }}</p>
+    <p><strong>Project:</strong> {{ customer.booking.project.project_name }}</p>
+    <p><strong>Plot:</strong> {{ customer.booking.plot.plot_number }}</p>
+
+    <hr>
+
+    <h4>Registration</h4>
+
+    <p><strong>Status:</strong> {{ customer.registration_status }}</p>
+    <p><strong>Date:</strong> {{ customer.registration_date }}</p>
+
+    <hr>
+
+    <h4>Ownership</h4>
+
+    <p><strong>Status:</strong> {{ customer.ownership_status }}</p>
+
+    <hr>
+
+    <h4>Payment History</h4>
+
+    {% for payment in payments %}
+        <p>
+            {{ payment.payment_id }} -
+            ₹{{ payment.amount }} -
+            {{ payment.status }}
+        </p>
+    {% empty %}
+        <p>No payments found</p>
+    {% endfor %}
+
+</div>
+
+{% endblock %}
