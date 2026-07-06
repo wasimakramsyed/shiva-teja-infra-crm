@@ -9,23 +9,16 @@ class PaymentForm(forms.ModelForm):
         empty_label="Select Booking",
         widget=forms.Select(
             attrs={
-                'class': 'form-control'
+                'class': 'form-select'
             }
         )
     )
 
     class Meta:
         model = Payment
-        fields = [
-            'booking',
-            'payment_date',
-            'amount',
-            'payment_mode',
-            'transaction_id',
-            'receipt_number',
-            'receipt_upload',
-            'remarks',
-            'status'
+        exclude = [
+            'payment_id',
+            'receipt_number'
         ]
 
         widgets = {
@@ -54,7 +47,7 @@ class PaymentForm(forms.ModelForm):
                 }
             ),
 
-            'receipt_number': forms.TextInput(
+            'receipt_upload': forms.ClearableFileInput(
                 attrs={
                     'class': 'form-control'
                 }
@@ -63,25 +56,40 @@ class PaymentForm(forms.ModelForm):
             'remarks': forms.Textarea(
                 attrs={
                     'class': 'form-control',
-                    'rows': 2
+                    'rows': 3
                 }
             ),
 
             'status': forms.Select(
                 attrs={
-                    'class': 'form-control'
+                    'class': 'form-select'
                 }
             ),
         }
 
     def __init__(self, *args, **kwargs):
+        booking_id = kwargs.pop(
+            'booking_id',
+            None
+        )
+
         super().__init__(*args, **kwargs)
 
+        # Better booking dropdown display
         self.fields[
             'booking'
         ].label_from_instance = (
             lambda obj: (
-                f"{obj.booking_id} - "
-                f"{obj.booked_client_name}"
+                f"{obj.booking_id} | "
+                f"{obj.booked_client_name} | "
+                f"{obj.project.project_name} | "
+                f"{obj.plot.plot_number}"
             )
         )
+
+        # Auto-select booking if opened from booking profile
+        if booking_id:
+            self.fields['booking'].initial = booking_id
+            self.fields['booking'].widget.attrs[
+                'readonly'
+            ] = True

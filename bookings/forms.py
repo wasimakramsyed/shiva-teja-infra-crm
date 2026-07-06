@@ -1,44 +1,13 @@
 from django import forms
 from .models import Booking
-from leads.models import Lead
-from projects.models import Project, Plot
+from projects.models import Plot
 
 
 class BookingForm(forms.ModelForm):
-    lead = forms.ModelChoiceField(
-        queryset=Lead.objects.all(),
-        empty_label="Select Lead",
-        widget=forms.Select(
-            attrs={
-                'class': 'form-control'
-            }
-        )
-    )
-
-    project = forms.ModelChoiceField(
-        queryset=Project.objects.all(),
-        empty_label="Select Project",
-        widget=forms.Select(
-            attrs={
-                'class': 'form-control'
-            }
-        )
-    )
-
-    plot = forms.ModelChoiceField(
-        queryset=Plot.objects.filter(
-            status='available'
-        ),
-        empty_label="Select Plot",
-        widget=forms.Select(
-            attrs={
-                'class': 'form-control'
-            }
-        )
-    )
 
     class Meta:
         model = Booking
+
         fields = [
             'booking_date',
             'lead',
@@ -55,11 +24,14 @@ class BookingForm(forms.ModelForm):
             'booking_form',
             'customer_photo',
             'aadhaar',
-            'pan',
-            'status'
+            'pan'
         ]
 
         widgets = {
+            'lead': forms.Select(
+                attrs={'class': 'form-select'}
+            ),
+
             'booking_date': forms.DateInput(
                 attrs={
                     'type': 'date',
@@ -76,6 +48,18 @@ class BookingForm(forms.ModelForm):
             'mobile_number': forms.TextInput(
                 attrs={
                     'class': 'form-control'
+                }
+            ),
+
+            'project': forms.Select(
+                attrs={
+                    'class': 'form-select'
+                }
+            ),
+
+            'plot': forms.Select(
+                attrs={
+                    'class': 'form-select'
                 }
             ),
 
@@ -106,18 +90,36 @@ class BookingForm(forms.ModelForm):
             'booking_remarks': forms.Textarea(
                 attrs={
                     'class': 'form-control',
-                    'rows': 2
+                    'rows': 3
                 }
             ),
 
             'special_instructions': forms.Textarea(
                 attrs={
                     'class': 'form-control',
-                    'rows': 2
+                    'rows': 3
                 }
             ),
 
-            'status': forms.Select(
+            'booking_form': forms.ClearableFileInput(
+                attrs={
+                    'class': 'form-control'
+                }
+            ),
+
+            'customer_photo': forms.ClearableFileInput(
+                attrs={
+                    'class': 'form-control'
+                }
+            ),
+
+            'aadhaar': forms.ClearableFileInput(
+                attrs={
+                    'class': 'form-control'
+                }
+            ),
+
+            'pan': forms.ClearableFileInput(
                 attrs={
                     'class': 'form-control'
                 }
@@ -125,30 +127,45 @@ class BookingForm(forms.ModelForm):
         }
 
     def __init__(self, *args, **kwargs):
+
         super().__init__(*args, **kwargs)
 
-        self.fields[
-            'lead'
-        ].label_from_instance = (
-            lambda obj: (
-                f"{obj.lead_name} "
-                f"({obj.mobile_number})"
-            )
-        )
+        # Better Labels
+        self.fields['booking_amount'].label = "Total Plot Price"
+        self.fields['advance_amount'].label = "Booking Advance"
 
-        self.fields[
-            'project'
-        ].label_from_instance = (
-            lambda obj: (
-                f"{obj.project_name}"
-            )
-        )
+        # Optional Documents
+        for field in [
+            'booking_form',
+            'customer_photo',
+            'aadhaar',
+            'pan'
+        ]:
+            self.fields[field].required = False
 
-        self.fields[
-            'plot'
-        ].label_from_instance = (
-            lambda obj: (
-                f"{obj.plot_number} "
-                f"- {obj.plot_size}"
-            )
-        )
+        # No plots initially
+        self.fields['plot'].queryset = Plot.objects.none()
+
+        # Load plots after selecting project
+        if self.data.get('project'):
+
+            try:
+
+                project_id = int(
+                    self.data.get('project')
+                )
+
+                self.fields['plot'].queryset = Plot.objects.filter(
+                    project_id=project_id,
+                    status='available'
+                ).order_by('plot_number')
+
+            except (ValueError, TypeError):
+                pass
+
+        # Editing existing booking
+        elif self.instance.pk:
+
+            self.fields['plot'].queryset = Plot.objects.filter(
+                project=self.instance.project
+            ).order_by('plot_number')

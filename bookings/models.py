@@ -4,6 +4,7 @@ from leads.models import Lead
 from projects.models import Project, Plot
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from leads.models import Lead
 
 
 class Booking(models.Model):
@@ -25,10 +26,10 @@ class Booking(models.Model):
 
     lead = models.ForeignKey(
     Lead,
-    on_delete=models.CASCADE,
-    related_name='bookings',
+    on_delete=models.SET_NULL,
     null=True,
-    blank=True
+    blank=True,
+    related_name='bookings'
 )
 
     project = models.ForeignKey(
@@ -158,6 +159,8 @@ class Booking(models.Model):
 
     def __str__(self):
         return self.booking_id
+    
+    
 
 
 @receiver(post_save, sender=Booking)

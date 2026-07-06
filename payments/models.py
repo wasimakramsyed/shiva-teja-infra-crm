@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.exceptions import ValidationError
 from bookings.models import Booking
 from customers.models import Customer
 from django.db.models.signals import post_save
@@ -43,7 +44,8 @@ class Payment(models.Model):
 
     receipt_number = models.CharField(
         max_length=30,
-        unique=True
+        unique=True,
+        blank=True
     )
 
     receipt_upload = models.FileField(
@@ -67,6 +69,19 @@ class Payment(models.Model):
         auto_now_add=True
     )
 
+    def clean(self):
+        total_paid = sum(
+            payment.amount
+            for payment in self.booking.payments.all()
+        )
+
+        total_paid += self.booking.advance_amount
+
+        if (total_paid + self.amount) > self.booking.booking_amount:
+            raise ValidationError(
+                "Payment exceeds the pending amount."
+            )
+
     def save(self, *args, **kwargs):
         if not self.payment_id:
             last_payment = Payment.objects.order_by(
@@ -86,6 +101,11 @@ class Payment(models.Model):
 
             self.payment_id = f"PAY{new_id:03d}"
 
+        if not self.receipt_number:
+            self.receipt_number = (
+                f"REC{self.payment_id.replace('PAY', '')}"
+            )
+
         super().save(*args, **kwargs)
 
     def __str__(self):
@@ -97,9 +117,12 @@ def update_booking_payment(sender, instance, created, **kwargs):
     if created:
         booking = instance.booking
 
-        total_paid = sum(
-            payment.amount
-            for payment in booking.payments.all()
+        total_paid = (
+            booking.advance_amount +
+            sum(
+                payment.amount
+                for payment in booking.payments.all()
+            )
         )
 
         booking.pending_amount = (

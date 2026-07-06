@@ -29,7 +29,6 @@ class Project(models.Model):
 
     total_plots = models.PositiveIntegerField()
 
-    # Optional project value
     project_value = models.DecimalField(
         max_digits=15,
         decimal_places=2,
@@ -52,6 +51,8 @@ class Project(models.Model):
     )
 
     def save(self, *args, **kwargs):
+        is_new = self.pk is None
+
         if not self.project_id:
             last_project = Project.objects.order_by(
                 '-id'
@@ -72,6 +73,23 @@ class Project(models.Model):
 
         super().save(*args, **kwargs)
 
+        # Count existing plots
+        existing_plots = self.plots.count()
+
+        # Auto create missing plots
+        if self.total_plots > existing_plots:
+            for i in range(
+                existing_plots + 1,
+                self.total_plots + 1
+            ):
+                Plot.objects.create(
+                    project=self,
+                    plot_number=f"P{i:03d}",
+                    plot_size="Not Assigned",
+                    facing="Not Assigned",
+                    status='available'
+                )
+
     def __str__(self):
         return f"{self.project_id} - {self.project_name}"
 
@@ -86,9 +104,7 @@ class Plot(models.Model):
     project = models.ForeignKey(
         Project,
         on_delete=models.CASCADE,
-        related_name='plots',
-        blank=True,
-        null=True
+        related_name='plots'
     )
 
     plot_number = models.CharField(
@@ -96,11 +112,13 @@ class Plot(models.Model):
     )
 
     plot_size = models.CharField(
-        max_length=50
+        max_length=50,
+        default="Not Assigned"
     )
 
     facing = models.CharField(
-        max_length=50
+        max_length=50,
+        default="Not Assigned"
     )
 
     status = models.CharField(
@@ -114,4 +132,7 @@ class Plot(models.Model):
     )
 
     def __str__(self):
-        return f"{self.plot_number} ({self.project.project_name if self.project else 'No Project'})"
+        return (
+            f"{self.plot_number} "
+            f"({self.project.project_name})"
+        )

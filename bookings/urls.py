@@ -3,7 +3,7 @@ from .views import (
     booking_list,
     create_booking,
     booking_profile,
-    edit_booking
+    load_plots
 )
 
 urlpatterns = [
@@ -20,14 +20,14 @@ urlpatterns = [
     ),
 
     path(
-        'bookings/<int:booking_id>/',
-        booking_profile,
-        name='booking_profile'
+        'ajax/load-plots/',
+        load_plots,
+        name='ajax_load_plots'
     ),
 
     path(
-        'bookings/edit/<int:booking_id>/',
-        edit_booking,
-        name='edit_booking'
-    ),
+    'bookings/<int:booking_id>/',
+    booking_profile,
+    name='booking_profile'
+),
 ]

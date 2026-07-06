@@ -3,7 +3,8 @@ from .views import (
     payment_list,
     create_payment,
     payment_profile,
-    edit_payment
+    edit_payment,
+    generate_payment_receipt
 )
 
 urlpatterns = [
@@ -30,4 +31,9 @@ urlpatterns = [
         edit_payment,
         name='edit_payment'
     ),
+    path(
+    'payments/receipt/<int:payment_id>/',
+    generate_payment_receipt,
+    name='generate_payment_receipt'
+),
 ]

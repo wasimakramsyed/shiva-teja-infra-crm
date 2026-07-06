@@ -93,6 +93,10 @@ def edit_lead(request, lead_id):
     )
 
 
+from django.contrib import messages
+from bookings.models import Booking
+
+
 @role_required(['admin', 'sales'])
 def convert_lead(request, lead_id):
     lead = get_object_or_404(
@@ -100,19 +104,13 @@ def convert_lead(request, lead_id):
         id=lead_id
     )
 
-    if hasattr(lead, 'customer'):
-        return redirect('/leads/')
-
-    Customer.objects.create(
-        lead=lead,
-        customer_name=lead.lead_name,
-        mobile_number=lead.mobile_number,
-        email=lead.email,
-        address=lead.address,
-        assigned_to=lead.assigned_employee
-    )
-
+    # Only mark as converted
     lead.status = 'converted'
     lead.save()
 
-    return redirect('/leads/')
+    messages.success(
+        request,
+        "Lead converted successfully. Create booking now."
+    )
+
+    return redirect(f'/bookings/create/?lead={lead.id}')

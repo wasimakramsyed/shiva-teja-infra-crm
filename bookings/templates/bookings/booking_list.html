@@ -16,6 +16,7 @@
                 class="form-control"
             >
         </div>
+        
 
         <div class="col-md-4">
             <select
@@ -69,7 +70,16 @@
             <td>₹{{ booking.booking_amount }}</td>
             <td>₹{{ booking.pending_amount }}</td>
             <td>{{ booking.status }}</td>
-            <td>
+
+        <td>
+            <a
+                href="/bookings/{{ booking.id }}/"
+                class="btn btn-sm btn-primary"
+            >
+                View
+            </a>
+        </td>
+        <td>
                 <a href="/bookings/{{ booking.id }}/">View</a> |
                 <a href="/bookings/edit/{{ booking.id }}/">Edit</a>
             </td>
