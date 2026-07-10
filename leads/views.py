@@ -3,7 +3,7 @@ from .models import Lead
 from .forms import LeadForm
 from customers.models import Customer
 from accounts.decorators import role_required
-
+from django.http import JsonResponse
 
 @role_required(['admin', 'manager', 'sales'])
 def lead_list(request):
@@ -114,3 +114,40 @@ def convert_lead(request, lead_id):
     )
 
     return redirect(f'/bookings/create/?lead={lead.id}')
+def get_lead_details(request):
+
+    lead_id = request.GET.get("lead_id")
+
+    if not lead_id:
+        return JsonResponse({})
+
+    try:
+
+        lead = Lead.objects.select_related(
+            "assigned_employee",
+            "assigned_team"
+        ).get(id=lead_id)
+
+        return JsonResponse({
+
+            "name": lead.lead_name,
+
+            "mobile": lead.mobile_number,
+
+            "employee_id": (
+                lead.assigned_employee.id
+                if lead.assigned_employee
+                else ""
+            ),
+
+            "team_id": (
+                lead.assigned_team.id
+                if lead.assigned_team
+                else ""
+            ),
+
+        })
+
+    except Lead.DoesNotExist:
+
+        return JsonResponse({})

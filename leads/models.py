@@ -2,22 +2,23 @@ from django.db import models
 from employees.models import Employee
 from teams.models import Team
 from projects.models import Project
-
+from common.services.id_generator import IDGenerator
 
 class Lead(models.Model):
+
     STATUS_CHOICES = [
-        ('new', 'New'),
-        ('contacted', 'Contacted'),
-        ('interested', 'Interested'),
-        ('follow_up', 'Follow-Up'),
-        ('converted', 'Converted'),
-        ('closed', 'Closed'),
+        ("new", "New"),
+        ("contacted", "Contacted"),
+        ("qualified", "Qualified"),
+        ("negotiation", "Negotiation"),
+        ("converted", "Converted"),
+        ("lost", "Lost"),
     ]
 
     PRIORITY_CHOICES = [
-        ('low', 'Low'),
-        ('medium', 'Medium'),
-        ('high', 'High'),
+        ("low", "Low"),
+        ("medium", "Medium"),
+        ("high", "High"),
     ]
 
     lead_id = models.CharField(
@@ -103,24 +104,14 @@ class Lead(models.Model):
     )
 
     def save(self, *args, **kwargs):
+
         if not self.lead_id:
-            last_lead = Lead.objects.order_by(
-                '-id'
-            ).first()
 
-            if last_lead:
-                last_id = int(
-                    last_lead.lead_id.replace(
-                        'LEAD',
-                        ''
-                    )
-                )
-                new_id = last_id + 1
-            else:
-                new_id = 1
-
-            self.lead_id = f"LEAD{new_id:03d}"
-
+            self.lead_id = IDGenerator.generate(
+            model=Lead,
+            field="lead_id",
+            prefix="LEAD"
+            )
         super().save(*args, **kwargs)
 
     def __str__(self):

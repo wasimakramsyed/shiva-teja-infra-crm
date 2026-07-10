@@ -3,7 +3,10 @@ from django.core.exceptions import ValidationError
 from django.contrib import messages
 from django.db.models import Q
 from django.http import JsonResponse
-
+from django.contrib import messages
+from bookings.services.booking_service import BookingService
+from django.http import HttpResponse
+from reportlab.pdfgen import canvas
 from .models import Booking
 from .forms import BookingForm
 
@@ -24,19 +27,34 @@ def booking_list(request):
     status_filter = request.GET.get('status')
 
     bookings = Booking.objects.select_related(
-        'project',
-        'plot',
-        'lead'
-    )
+    "project",
+    "plot",
+    "lead",
+    "assigned_employee",
+    "assigned_team",
+)
 
     if query:
+
         bookings = bookings.filter(
-            Q(booking_id__icontains=query) |
-            Q(booked_client_name__icontains=query) |
-            Q(mobile_number__icontains=query) |
-            Q(project__project_name__icontains=query) |
-            Q(plot__plot_number__icontains=query)
-        )
+
+        Q(booking_id__icontains=query) |
+
+        Q(booked_client_name__icontains=query) |
+
+        Q(mobile_number__icontains=query) |
+
+        Q(project__project_name__icontains=query) |
+
+        Q(plot__plot_number__icontains=query) |
+
+        Q(assigned_employee__first_name__icontains=query) |
+
+        Q(assigned_employee__surname__icontains=query) |
+
+        Q(assigned_team__team_name__icontains=query)
+
+    ).distinct()
 
     if status_filter:
         bookings = bookings.filter(status=status_filter)
@@ -55,7 +73,7 @@ def booking_list(request):
 # ==========================================================
 # Create Booking
 # ==========================================================
-@role_required(['admin', 'manager', 'sales'])
+@role_required(['sales', 'admin', 'manager'])
 def create_booking(request):
 
     form = BookingForm(
@@ -63,50 +81,15 @@ def create_booking(request):
         request.FILES or None
     )
 
-    lead_id = request.GET.get('lead')
-
-    if lead_id and request.method != 'POST':
-        try:
-            lead = Lead.objects.get(id=lead_id)
-
-            form.initial['lead'] = lead
-            form.initial['booked_client_name'] = lead.lead_name
-            form.initial['mobile_number'] = lead.mobile_number
-            form.initial['project'] = lead.project
-
-        except Lead.DoesNotExist:
-            pass
-
-    if request.method == 'POST':
+    if request.method == "POST":
 
         if form.is_valid():
 
             try:
 
-                booking = form.save(commit=False)
-                
-                print("Lead =", booking.lead)
-                print("Lead ID =", booking.lead_id)
-
-                booking.full_clean()
-
-                booking.save()
-
-                # Update plot status
-                booking.plot.status = 'booked'
-                booking.plot.save()
-
-                # Update lead
-                if booking.lead:
-                    booking.lead.status = 'converted'
-                    booking.lead.save()
-
-                # Notification
-                Notification.objects.create(
-                    message=(
-                        f"Booking Created : "
-                        f"{booking.booking_id}"
-                    )
+                booking = BookingService.create_booking(
+                    form=form,
+                    user=request.user
                 )
 
                 messages.success(
@@ -115,36 +98,44 @@ def create_booking(request):
                 )
 
                 return redirect(
-                    'booking_profile',
+                    "booking_profile",
                     booking_id=booking.id
                 )
 
             except ValidationError as e:
 
-                form.add_error(
-                    None,
-                    e
-                )
-
                 messages.error(
                     request,
-                    "Please correct the errors below."
+                    str(e)
                 )
 
         else:
 
-            print(form.errors)
-
             messages.error(
                 request,
-                "Please correct the errors below."
+                "Please correct the highlighted errors."
             )
+
+    lead_id = request.GET.get("lead")
+
+    if lead_id:
+
+        try:
+
+            lead = Lead.objects.get(id=lead_id)
+
+            form.initial["lead"] = lead
+            form.initial["booked_client_name"] = lead.lead_name
+            form.initial["mobile_number"] = lead.mobile_number
+
+        except Lead.DoesNotExist:
+            pass
 
     return render(
         request,
-        'bookings/create_booking.html',
+        "bookings/create_booking.html",
         {
-            'form': form
+            "form": form
         }
     )
 
@@ -181,7 +172,8 @@ def booking_profile(request, booking_id):
             'booking': booking,
             'payments': payments,
             'total_paid': total_paid,
-            'pending': pending
+            'pending': pending,
+            'activities': booking.activities.all()
         }
     )
 
@@ -256,3 +248,104 @@ def load_plots(request):
         list(plots),
         safe=False
     )
+
+# ==========================================================
+# Print Booking
+# ==========================================================
+@role_required(['admin', 'manager', 'sales'])
+def print_booking(request, booking_id):
+
+    booking = get_object_or_404(
+        Booking,
+        id=booking_id
+    )
+
+    payments = Payment.objects.filter(
+        booking=booking
+    )
+
+    total_paid = booking.advance_amount + sum(
+        payment.amount
+        for payment in payments
+    )
+
+    pending = booking.booking_amount - total_paid
+
+    response = HttpResponse(
+        content_type="application/pdf"
+    )
+
+    response[
+        "Content-Disposition"
+    ] = (
+        f'attachment; filename="{booking.booking_id}.pdf"'
+    )
+
+    pdf = canvas.Canvas(response)
+
+    pdf.setTitle("Booking Confirmation")
+
+    pdf.setFont("Helvetica-Bold", 18)
+    pdf.drawString(
+        170,
+        800,
+        "SHIVA TEJA INFRA"
+    )
+
+    pdf.setFont("Helvetica-Bold", 14)
+    pdf.drawString(
+        180,
+        775,
+        "Booking Confirmation"
+    )
+
+    pdf.setFont("Helvetica", 11)
+
+    y = 735
+
+    details = [
+        ("Booking ID", booking.booking_id),
+        ("Booking Date", str(booking.booking_date)),
+        ("Customer", booking.booked_client_name),
+        ("Mobile", booking.mobile_number),
+        ("Project", booking.project.project_name),
+        ("Plot", booking.plot.plot_number),
+        ("Booking Amount", f"₹ {booking.booking_amount}"),
+        ("Advance Paid", f"₹ {booking.advance_amount}"),
+        ("Total Paid", f"₹ {total_paid}"),
+        ("Pending", f"₹ {pending}"),
+        ("Status", booking.status),
+    ]
+
+    for label, value in details:
+
+        pdf.drawString(
+            60,
+            y,
+            f"{label}:"
+        )
+
+        pdf.drawString(
+            220,
+            y,
+            str(value)
+        )
+
+        y -= 25
+
+    pdf.line(
+        60,
+        120,
+        220,
+        120
+    )
+
+    pdf.drawString(
+        60,
+        100,
+        "Authorized Signature"
+    )
+
+    pdf.save()
+
+    return response

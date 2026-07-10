@@ -1,6 +1,6 @@
 from django.db import models
 from bookings.models import Booking
-
+from common.services.id_generator import IDGenerator
 
 class Customer(models.Model):
     REGISTRATION_STATUS = [
@@ -91,7 +91,21 @@ class Customer(models.Model):
         blank=True,
         null=True
     )
+    created_by = models.ForeignKey(
+        "accounts.User",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="created_customers"
+    )
 
+    updated_by = models.ForeignKey(
+        "accounts.User",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="updated_customers"
+    )
     registration_status = models.CharField(
         max_length=20,
         choices=REGISTRATION_STATUS,
@@ -114,23 +128,14 @@ class Customer(models.Model):
     )
 
     def save(self, *args, **kwargs):
+
         if not self.customer_id:
-            last_customer = Customer.objects.order_by(
-                '-id'
-            ).first()
 
-            if last_customer:
-                last_id = int(
-                    last_customer.customer_id.replace(
-                        'CUS',
-                        ''
-                    )
-                )
-                new_id = last_id + 1
-            else:
-                new_id = 1
-
-            self.customer_id = f"CUS{new_id:03d}"
+            self.customer_id = IDGenerator.generate(
+            model=Customer,
+            field="customer_id",
+            prefix="CUS"
+            )
 
         super().save(*args, **kwargs)
 

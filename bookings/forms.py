@@ -1,127 +1,158 @@
 from django import forms
+
 from .models import Booking
 from projects.models import Plot
+from employees.models import Employee
+from teams.models import Team
 
 
 class BookingForm(forms.ModelForm):
 
     class Meta:
+
         model = Booking
 
         fields = [
-            'booking_date',
-            'lead',
-            'project',
-            'plot',
-            'booked_client_name',
-            'mobile_number',
-            'booking_amount',
-            'advance_amount',
-            'payment_mode',
-            'reference_number',
-            'booking_remarks',
-            'special_instructions',
-            'booking_form',
-            'customer_photo',
-            'aadhaar',
-            'pan'
+            "booking_date",
+            "lead",
+            "booking_source",
+            "assigned_employee",
+            "assigned_team",
+            "project",
+            "plot",
+            "booked_client_name",
+            "mobile_number",
+            "booking_amount",
+            "advance_amount",
+            "payment_mode",
+            "reference_number",
+            "booking_remarks",
+            "special_instructions",
+            "booking_form",
+            "customer_photo",
+            "aadhaar",
+            "pan",
         ]
 
         widgets = {
-            'lead': forms.Select(
-                attrs={'class': 'form-select'}
-            ),
 
-            'booking_date': forms.DateInput(
+            "booking_date": forms.DateInput(
                 attrs={
-                    'type': 'date',
-                    'class': 'form-control'
+                    "type": "date",
+                    "class": "form-control"
                 }
             ),
 
-            'booked_client_name': forms.TextInput(
+            "lead": forms.Select(
                 attrs={
-                    'class': 'form-control'
+                    "class": "form-select"
                 }
             ),
 
-            'mobile_number': forms.TextInput(
+            "booking_source": forms.Select(
                 attrs={
-                    'class': 'form-control'
+                    "class": "form-select"
                 }
             ),
 
-            'project': forms.Select(
+            "assigned_employee": forms.Select(
                 attrs={
-                    'class': 'form-select'
+                    "class": "form-select"
                 }
             ),
 
-            'plot': forms.Select(
+            "assigned_team": forms.Select(
                 attrs={
-                    'class': 'form-select'
+                    "class": "form-select"
                 }
             ),
 
-            'booking_amount': forms.NumberInput(
+            "project": forms.Select(
                 attrs={
-                    'class': 'form-control'
+                    "class": "form-select"
                 }
             ),
 
-            'advance_amount': forms.NumberInput(
+            "plot": forms.Select(
                 attrs={
-                    'class': 'form-control'
+                    "class": "form-select"
                 }
             ),
 
-            'payment_mode': forms.TextInput(
+            "booked_client_name": forms.TextInput(
                 attrs={
-                    'class': 'form-control'
+                    "class": "form-control",
+                    "placeholder": "Customer Name"
                 }
             ),
 
-            'reference_number': forms.TextInput(
+            "mobile_number": forms.TextInput(
                 attrs={
-                    'class': 'form-control'
+                    "class": "form-control",
+                    "placeholder": "Mobile Number"
                 }
             ),
 
-            'booking_remarks': forms.Textarea(
+            "booking_amount": forms.NumberInput(
                 attrs={
-                    'class': 'form-control',
-                    'rows': 3
+                    "class": "form-control"
                 }
             ),
 
-            'special_instructions': forms.Textarea(
+            "advance_amount": forms.NumberInput(
                 attrs={
-                    'class': 'form-control',
-                    'rows': 3
+                    "class": "form-control"
                 }
             ),
 
-            'booking_form': forms.ClearableFileInput(
+            "payment_mode": forms.Select(
                 attrs={
-                    'class': 'form-control'
+                    "class": "form-select"
                 }
             ),
 
-            'customer_photo': forms.ClearableFileInput(
+            "reference_number": forms.TextInput(
                 attrs={
-                    'class': 'form-control'
+                    "class": "form-control",
+                    "placeholder": "Reference Number (Optional)"
                 }
             ),
 
-            'aadhaar': forms.ClearableFileInput(
+            "booking_remarks": forms.Textarea(
                 attrs={
-                    'class': 'form-control'
+                    "class": "form-control",
+                    "rows": 3
                 }
             ),
 
-            'pan': forms.ClearableFileInput(
+            "special_instructions": forms.Textarea(
                 attrs={
-                    'class': 'form-control'
+                    "class": "form-control",
+                    "rows": 3
+                }
+            ),
+
+            "booking_form": forms.ClearableFileInput(
+                attrs={
+                    "class": "form-control"
+                }
+            ),
+
+            "customer_photo": forms.ClearableFileInput(
+                attrs={
+                    "class": "form-control"
+                }
+            ),
+
+            "aadhaar": forms.ClearableFileInput(
+                attrs={
+                    "class": "form-control"
+                }
+            ),
+
+            "pan": forms.ClearableFileInput(
+                attrs={
+                    "class": "form-control"
                 }
             ),
         }
@@ -130,42 +161,91 @@ class BookingForm(forms.ModelForm):
 
         super().__init__(*args, **kwargs)
 
-        # Better Labels
-        self.fields['booking_amount'].label = "Total Plot Price"
-        self.fields['advance_amount'].label = "Booking Advance"
+        # ------------------------
+        # Labels
+        # ------------------------
 
-        # Optional Documents
+        self.fields["booking_amount"].label = "Total Plot Price"
+        self.fields["advance_amount"].label = "Booking Advance"
+
+        if not self.instance.pk:
+            self.fields["advance_amount"].initial = None
+
+        # ------------------------
+        # Optional Files
+        # ------------------------
+
         for field in [
-            'booking_form',
-            'customer_photo',
-            'aadhaar',
-            'pan'
+            "booking_form",
+            "customer_photo",
+            "aadhaar",
+            "pan",
         ]:
             self.fields[field].required = False
 
-        # No plots initially
-        self.fields['plot'].queryset = Plot.objects.none()
+        # ------------------------
+        # Employee & Team
+        # ------------------------
 
-        # Load plots after selecting project
-        if self.data.get('project'):
+        self.fields["assigned_employee"].queryset = Employee.objects.filter(
+            status="active"
+        ).order_by("first_name")
+
+        self.fields["assigned_team"].queryset = Team.objects.filter(
+            status="active"
+        ).order_by("team_name")
+
+        # ------------------------
+        # Plot Loading
+        # ------------------------
+
+        self.fields["plot"].queryset = Plot.objects.none()
+
+        if self.data.get("project"):
 
             try:
 
                 project_id = int(
-                    self.data.get('project')
+                    self.data.get("project")
                 )
 
-                self.fields['plot'].queryset = Plot.objects.filter(
+                self.fields["plot"].queryset = Plot.objects.filter(
                     project_id=project_id,
-                    status='available'
-                ).order_by('plot_number')
+                    status="available"
+                ).order_by("plot_number")
 
             except (ValueError, TypeError):
                 pass
 
-        # Editing existing booking
         elif self.instance.pk:
 
-            self.fields['plot'].queryset = Plot.objects.filter(
+            self.fields["plot"].queryset = Plot.objects.filter(
                 project=self.instance.project
-            ).order_by('plot_number')
+            ).order_by("plot_number")
+
+    def clean(self):
+
+        cleaned_data = super().clean()
+
+        lead = cleaned_data.get("lead")
+
+        employee = cleaned_data.get("assigned_employee")
+        team = cleaned_data.get("assigned_team")
+
+        # Direct Booking
+
+        if not lead:
+
+            if not employee:
+                self.add_error(
+                    "assigned_employee",
+                    "Please select an employee."
+                )
+
+            if not team:
+                self.add_error(
+                    "assigned_team",
+                    "Please select a team."
+                )
+
+        return cleaned_data

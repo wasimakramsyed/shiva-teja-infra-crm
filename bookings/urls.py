@@ -3,10 +3,13 @@ from .views import (
     booking_list,
     create_booking,
     booking_profile,
+    edit_booking,
+    print_booking,
     load_plots
 )
 
 urlpatterns = [
+
     path(
         'bookings/',
         booking_list,
@@ -26,8 +29,21 @@ urlpatterns = [
     ),
 
     path(
-    'bookings/<int:booking_id>/',
-    booking_profile,
-    name='booking_profile'
-),
+        'bookings/<int:booking_id>/',
+        booking_profile,
+        name='booking_profile'
+    ),
+
+    path(
+        'bookings/edit/<int:booking_id>/',
+        edit_booking,
+        name='edit_booking'
+    ),
+
+    path(
+        'bookings/print/<int:booking_id>/',
+        print_booking,
+        name='print_booking'
+    ),
+
 ]

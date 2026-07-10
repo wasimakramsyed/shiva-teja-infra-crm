@@ -1,25 +1,54 @@
-{% extends 'base.html' %}
+from registrations.services.registration_service import RegistrationService
+from django.contrib import messages
+from django.core.exceptions import ValidationError
 
-{% block content %}
 
-<h2 class="mb-4">Create Registration</h2>
+@role_required(["admin", "manager"])
+def create_registration(request):
 
-<div class="card shadow-sm">
-    <div class="card-body">
+    form = RegistrationForm(
+        request.POST or None,
+        request.FILES or None
+    )
 
-        <form method="POST" enctype="multipart/form-data">
-            {% csrf_token %}
-            {{ form.as_p }}
+    if request.method == "POST":
 
-            <button
-                type="submit"
-                class="btn btn-success"
-            >
-                Save Registration
-            </button>
-        </form>
+        if form.is_valid():
 
-    </div>
-</div>
+            try:
 
-{% endblock %}
+                registration = RegistrationService.register_property(
+                    form=form,
+                    user=request.user
+                )
+
+                messages.success(
+                    request,
+                    f"Registration {registration.registration_id} completed successfully."
+                )
+
+                return redirect(
+                    "registration_list"
+                )
+
+            except ValidationError as e:
+
+                messages.error(
+                    request,
+                    str(e)
+                )
+
+        else:
+
+            messages.error(
+                request,
+                "Please correct the errors below."
+            )
+
+    return render(
+        request,
+        "registrations/create_registration.html",
+        {
+            "form": form
+        }
+    )

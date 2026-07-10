@@ -1,34 +1,71 @@
 from django.db import models
 from bookings.models import Booking
-from django.db.models.signals import post_save
-from django.dispatch import receiver
+from customers.models import Customer
+from accounts.models import User
+from common.services.id_generator import IDGenerator
 
 
 class Registration(models.Model):
+
     registration_id = models.CharField(
         max_length=20,
         unique=True,
-        default='REG-000'
+        blank=True
     )
 
     booking = models.OneToOneField(
         Booking,
         on_delete=models.CASCADE,
-        related_name='registration'
+        related_name="registration"
     )
 
-    registration_date = models.DateField(
-        auto_now_add=True
+    customer = models.OneToOneField(
+        Customer,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="registration"
     )
 
-    registrar_name = models.CharField(
-        max_length=150,
-        default='Default Registrar'
+    registration_date = models.DateField()
+
+    registrar_office = models.CharField(
+        max_length=200
+    )
+
+    registration_number = models.CharField(
+        max_length=100,
+        unique=True
     )
 
     document_number = models.CharField(
         max_length=100,
-        default='DOC-000'
+        blank=True,
+        null=True
+    )
+
+    sale_deed_number = models.CharField(
+        max_length=100,
+        blank=True,
+        null=True
+    )
+
+    market_value = models.DecimalField(
+        max_digits=15,
+        decimal_places=2,
+        default=0
+    )
+
+    stamp_duty = models.DecimalField(
+        max_digits=15,
+        decimal_places=2,
+        default=0
+    )
+
+    registration_fee = models.DecimalField(
+        max_digits=15,
+        decimal_places=2,
+        default=0
     )
 
     remarks = models.TextField(
@@ -36,22 +73,65 @@ class Registration(models.Model):
         null=True
     )
 
+    # Documents
+
+    sale_deed = models.FileField(
+        upload_to="registrations/",
+        blank=True,
+        null=True
+    )
+
+    registration_copy = models.FileField(
+        upload_to="registrations/",
+        blank=True,
+        null=True
+    )
+
+    ec_document = models.FileField(
+        upload_to="registrations/",
+        blank=True,
+        null=True
+    )
+
+    tax_receipt = models.FileField(
+        upload_to="registrations/",
+        blank=True,
+        null=True
+    )
+
+    other_document = models.FileField(
+        upload_to="registrations/",
+        blank=True,
+        null=True
+    )
+
+    created_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
+    )
+
     created_at = models.DateTimeField(
         auto_now_add=True
     )
 
+    updated_at = models.DateTimeField(
+        auto_now=True
+    )
+
+    def save(self, *args, **kwargs):
+
+        if not self.registration_id:
+
+            self.registration_id = IDGenerator.generate(
+                model=Registration,
+                field="registration_id",
+                prefix="REG"
+            )
+
+        super().save(*args, **kwargs)
+
     def __str__(self):
+
         return self.registration_id
-
-
-@receiver(post_save, sender=Registration)
-def update_registration_status(sender, instance, created, **kwargs):
-    if created:
-        booking = instance.booking
-
-        booking.status = 'registered'
-        booking.save()
-
-        plot = booking.plot
-        plot.status = 'registered'
-        plot.save()

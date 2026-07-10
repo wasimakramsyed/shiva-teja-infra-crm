@@ -1,121 +1,415 @@
-{% extends 'base.html' %}
+{% extends 'layouts/base.html' %}
 
 {% block content %}
 
-<div class="card shadow-sm p-4">
-    <h2 class="mb-4">Create Booking</h2>
+<div class="container-fluid">
 
-    <form method="POST" enctype="multipart/form-data">
-        {% csrf_token %}
-        {% if form.errors %}
-<div class="alert alert-danger">
-    <h5>Please correct the following errors:</h5>
+    <div class="card shadow">
 
-    {{ form.non_field_errors }}
+        <div class="card-header bg-primary text-white">
 
-    {% for field in form %}
-        {% for error in field.errors %}
-            <p>
-                <strong>{{ field.label }}</strong>:
-                {{ error }}
-            </p>
-        {% endfor %}
-    {% endfor %}
-</div>
-{% endif %}
+            <h3>Create Booking</h3>
+
+        </div>
+
+        <div class="card-body">
+
+            <form method="POST" enctype="multipart/form-data">
+
+                {% csrf_token %}
+
+                {% if form.errors %}
+
+                <div class="alert alert-danger">
+
+                    <strong>Please correct the following errors</strong>
+
+                    <hr>
+
+                    {{ form.non_field_errors }}
+
+                    {% for field in form %}
+                        {% for error in field.errors %}
+                            <div>
+                                <strong>{{ field.label }}</strong> :
+                                {{ error }}
+                            </div>
+                        {% endfor %}
+                    {% endfor %}
+
+                </div>
+
+                {% endif %}
+
+                <!-- ========================= -->
+<!-- Customer -->
+<!-- ========================= -->
+
+<div class="card mb-4">
+
+    <div class="card-header">
+
+        <h5>👤 Customer Information</h5>
+
+    </div>
+
+    <div class="card-body">
 
         <div class="row">
 
-            <div class="col-md-6">
-                <h5>Lead Details</h5>
+            <div class="col-md-6 mb-3">
+
                 {{ form.lead.label_tag }}
+
                 {{ form.lead }}
 
-                {{ form.booked_client_name.label_tag }}
-                {{ form.booked_client_name }}
-
-                {{ form.mobile_number.label_tag }}
-                {{ form.mobile_number }}
-
-                {{ form.booking_date.label_tag }}
-                {{ form.booking_date }}
             </div>
 
-            <div class="col-md-6">
-                <h5>Booking Details</h5>
-                {{ form.project.label_tag }}
-                {{ form.project }}
+            <div class="col-md-6 mb-3">
 
-                {{ form.plot.label_tag }}
-                {{ form.plot }}
+                {{ form.booking_source.label_tag }}
 
-                {{ form.booking_amount.label_tag }}
-                {{ form.booking_amount }}
+                {{ form.booking_source }}
 
-                {{ form.advance_amount.label_tag }}
-                {{ form.advance_amount }}
+            </div>
 
-                {{ form.payment_mode.label_tag }}
-                {{ form.payment_mode }}
+            <div class="col-md-6 mb-3" id="employeeDiv">
+
+                {{ form.assigned_employee.label_tag }}
+
+                {{ form.assigned_employee }}
+
+            </div>
+
+            <div class="col-md-6 mb-3" id="teamDiv">
+
+                {{ form.assigned_team.label_tag }}
+
+                {{ form.assigned_team }}
+
+            </div>
+
+            <div class="col-md-6 mb-3">
+
+                {{ form.booked_client_name.label_tag }}
+
+                {{ form.booked_client_name }}
+
+            </div>
+
+            <div class="col-md-6 mb-3">
+
+                {{ form.mobile_number.label_tag }}
+
+                {{ form.mobile_number }}
+
+            </div>
+
+            <div class="col-md-6 mb-3">
+
+                {{ form.booking_date.label_tag }}
+
+                {{ form.booking_date }}
+
             </div>
 
         </div>
 
-        <hr>
+    </div>
 
-        <h5>Documents</h5>
-
-        {{ form.booking_form.label_tag }}
-        {{ form.booking_form }}
-
-        {{ form.customer_photo.label_tag }}
-        {{ form.customer_photo }}
-
-        {{ form.aadhaar.label_tag }}
-        {{ form.aadhaar }}
-
-        {{ form.pan.label_tag }}
-        {{ form.pan }}
-
-        <br><br>
-
-        <button type="submit" class="btn btn-success">
-            Save Booking
-        </button>
-
-    </form>
 </div>
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-    const projectField = document.querySelector("#id_project");
-    const plotField = document.querySelector("#id_plot");
 
-    if (!projectField || !plotField) {
-        console.log("Project or Plot field not found");
-        return;
+                <!-- ========================= -->
+                <!-- Property -->
+                <!-- ========================= -->
+
+                <div class="card mb-4">
+
+                    <div class="card-header">
+
+                        <h5>🏡 Property Information</h5>
+
+                    </div>
+
+                    <div class="card-body">
+
+                        <div class="row">
+
+                            <div class="col-md-6 mb-3">
+
+                                {{ form.project.label_tag }}
+
+                                {{ form.project }}
+
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+
+                                {{ form.plot.label_tag }}
+
+                                {{ form.plot }}
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- ========================= -->
+                <!-- Payment -->
+                <!-- ========================= -->
+
+                <div class="card mb-4">
+
+                    <div class="card-header">
+
+                        <h5>💰 Payment Information</h5>
+
+                    </div>
+
+                    <div class="card-body">
+
+                        <div class="row">
+
+                            <div class="col-md-4 mb-3">
+
+                                {{ form.booking_amount.label_tag }}
+
+                                {{ form.booking_amount }}
+
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+
+                                {{ form.advance_amount.label_tag }}
+
+                                {{ form.advance_amount }}
+
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+
+                                {{ form.payment_mode.label_tag }}
+
+                                {{ form.payment_mode }}
+
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+
+                                {{ form.reference_number.label_tag }}
+
+                                {{ form.reference_number }}
+
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+
+                                {{ form.booking_remarks.label_tag }}
+
+                                {{ form.booking_remarks }}
+
+                            </div>
+
+                            <div class="col-md-12">
+
+                                {{ form.special_instructions.label_tag }}
+
+                                {{ form.special_instructions }}
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- ========================= -->
+                <!-- Documents -->
+                <!-- ========================= -->
+
+                <div class="card mb-4">
+
+                    <div class="card-header">
+
+                        <h5>📁 Documents</h5>
+
+                    </div>
+
+                    <div class="card-body">
+
+                        <div class="row">
+
+                            <div class="col-md-6 mb-3">
+
+                                {{ form.booking_form.label_tag }}
+
+                                {{ form.booking_form }}
+
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+
+                                {{ form.customer_photo.label_tag }}
+
+                                {{ form.customer_photo }}
+
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+
+                                {{ form.aadhaar.label_tag }}
+
+                                {{ form.aadhaar }}
+
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+
+                                {{ form.pan.label_tag }}
+
+                                {{ form.pan }}
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="text-end">
+
+                    <button class="btn btn-success btn-lg">
+
+                        Save Booking
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+const leadField = document.getElementById("id_lead");
+const bookingSourceField = document.getElementById("id_booking_source");
+const employeeDiv = document.getElementById("employeeDiv");
+const teamDiv = document.getElementById("teamDiv");
+
+function toggleFields() {
+
+    if (leadField && leadField.value) {
+
+        employeeDiv.style.display = "none";
+        teamDiv.style.display = "none";
+
+        if (bookingSourceField) {
+            bookingSourceField.value = "lead";
+            bookingSourceField.disabled = true;
+        }
+
+    } else {
+
+        employeeDiv.style.display = "block";
+        teamDiv.style.display = "block";
+
+        if (bookingSourceField) {
+            bookingSourceField.disabled = false;
+            bookingSourceField.value = "walk_in";
+        }
+
     }
 
-    projectField.addEventListener("change", function () {
-        const projectId = this.value;
+}
 
-        console.log("Selected Project:", projectId);
+if (leadField) {
 
-        fetch(`/ajax/load-plots/?project_id=${projectId}`)
-            .then(response => response.json())
+    toggleFields();
+
+    leadField.addEventListener("change", function () {
+
+        toggleFields();
+
+        if (!this.value) {
+
+            document.getElementById("id_booked_client_name").value = "";
+            document.getElementById("id_mobile_number").value = "";
+
+            return;
+
+        }
+
+        fetch(`/ajax/get-lead-details/?lead_id=${this.value}`)
+
+            .then(res => res.json())
+
             .then(data => {
-                console.log("Plots:", data);
 
-                plotField.innerHTML = '<option value="">Select Plot</option>';
+                document.getElementById("id_booked_client_name").value =
+                    data.name || "";
 
-                data.forEach(function (plot) {
-                    let option = document.createElement("option");
-                    option.value = plot.id;
-                    option.textContent = plot.plot_number;
-                    plotField.appendChild(option);
-                });
-            })
-            .catch(error => console.error("Error:", error));
+                document.getElementById("id_mobile_number").value =
+                    data.mobile || "";
+
+                if (data.employee_id) {
+                    document.getElementById("id_assigned_employee").value =
+                        data.employee_id;
+                }
+
+                if (data.team_id) {
+                    document.getElementById("id_assigned_team").value =
+                        data.team_id;
+                }
+
+            });
+
     });
-});
+
+}
+
+const projectField = document.getElementById("id_project");
+const plotField = document.getElementById("id_plot");
+
+if (projectField && plotField) {
+
+    projectField.addEventListener("change", function () {
+
+        fetch(`/ajax/load-plots/?project_id=${this.value}`)
+
+            .then(response => response.json())
+
+            .then(data => {
+
+                plotField.innerHTML =
+                    '<option value="">Select Plot</option>';
+
+                data.forEach(function(plot){
+
+                    plotField.innerHTML +=
+                        `<option value="${plot.id}">
+                            ${plot.plot_number}
+                        </option>`;
+
+                });
+
+            })
+
+            .catch(error => console.error(error));
+
+    });
+
+}
+
 </script>
+
 {% endblock %}

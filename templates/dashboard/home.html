@@ -1,0 +1,377 @@
+{% extends "layouts/base.html" %}
+
+{% block content %}
+
+<div class="container-fluid">
+
+    <!-- Welcome -->
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+
+            <h2 class="fw-bold">
+                Dashboard
+            </h2>
+
+            <p class="text-muted mb-0">
+                Welcome back,
+                {{ request.user.first_name }} 👋
+            </p>
+
+        </div>
+
+        <div>
+
+            <a href="/leads/create/" class="btn btn-primary">
+                <i class="fas fa-plus"></i>
+                New Lead
+            </a>
+
+        </div>
+
+    </div>
+
+    <!-- KPI ROW 1 -->
+
+    <div class="row g-4">
+
+        <div class="col-lg-3 col-md-6">
+
+            <div class="card border-0 shadow-sm">
+
+                <div class="card-body">
+
+                    <small class="text-muted">
+                        Revenue
+                    </small>
+
+                    <h3 class="fw-bold mt-2">
+                        ₹{{ total_revenue }}
+                    </h3>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-lg-3 col-md-6">
+
+            <div class="card border-0 shadow-sm">
+
+                <div class="card-body">
+
+                    <small class="text-muted">
+                        Customers
+                    </small>
+
+                    <h3 class="fw-bold mt-2">
+                        {{ total_customers }}
+                    </h3>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-lg-3 col-md-6">
+
+            <div class="card border-0 shadow-sm">
+
+                <div class="card-body">
+
+                    <small class="text-muted">
+                        Bookings
+                    </small>
+
+                    <h3 class="fw-bold mt-2">
+                        {{ total_bookings }}
+                    </h3>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-lg-3 col-md-6">
+
+            <div class="card border-0 shadow-sm">
+
+                <div class="card-body">
+
+                    <small class="text-muted">
+                        Pending Collection
+                    </small>
+
+                    <h3 class="fw-bold mt-2">
+                        ₹{{ pending_collection }}
+                    </h3>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- KPI ROW 2 -->
+
+    <div class="row g-4 mt-1">
+
+        <div class="col-lg-3 col-md-6">
+
+            <div class="card border-0 shadow-sm">
+
+                <div class="card-body">
+
+                    <small class="text-muted">
+                        Leads
+                    </small>
+
+                    <h3 class="fw-bold mt-2">
+                        {{ total_leads }}
+                    </h3>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-lg-3 col-md-6">
+
+            <div class="card border-0 shadow-sm">
+
+                <div class="card-body">
+
+                    <small class="text-muted">
+                        Projects
+                    </small>
+
+                    <h3 class="fw-bold mt-2">
+                        {{ total_projects }}
+                    </h3>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-lg-3 col-md-6">
+
+            <div class="card border-0 shadow-sm">
+
+                <div class="card-body">
+
+                    <small class="text-muted">
+                        Registrations
+                    </small>
+
+                    <h3 class="fw-bold mt-2">
+                        {{ total_registrations }}
+                    </h3>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-lg-3 col-md-6">
+
+            <div class="card border-0 shadow-sm">
+
+                <div class="card-body">
+
+                    <small class="text-muted">
+                        Commissions Paid
+                    </small>
+
+                    <h3 class="fw-bold mt-2">
+                        {{ paid_commissions }}
+                    </h3>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Quick Actions -->
+
+    <div class="card shadow-sm border-0 mt-4">
+
+        <div class="card-header bg-white">
+
+            <h5 class="mb-0">
+                Quick Actions
+            </h5>
+
+        </div>
+
+        <div class="card-body">
+
+            <div class="row text-center">
+
+                <div class="col-md-3">
+                    <a href="/leads/create/" class="btn btn-outline-primary w-100 mb-2">
+                        New Lead
+                    </a>
+                </div>
+
+                <div class="col-md-3">
+                    <a href="/bookings/create/" class="btn btn-outline-success w-100 mb-2">
+                        New Booking
+                    </a>
+                </div>
+
+                <div class="col-md-3">
+                    <a href="/payments/create/" class="btn btn-outline-warning w-100 mb-2">
+                        Receive Payment
+                    </a>
+                </div>
+
+                <div class="col-md-3">
+                    <a href="/customers/" class="btn btn-outline-dark w-100 mb-2">
+                        Customers
+                    </a>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="row mt-4">
+
+        <div class="col-lg-8">
+
+            <div class="card shadow-sm">
+
+                <div class="card-header bg-white">
+
+                    <h5 class="mb-0">
+                        Revenue Trend
+                    </h5>
+
+                </div>
+
+                <div class="card-body">
+
+                    <canvas id="revenueChart"></canvas>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-lg-4">
+
+            <div class="card shadow-sm">
+
+                <div class="card-header bg-white">
+
+                    <h5 class="mb-0">
+                        Plot Status
+                    </h5>
+
+                </div>
+
+                <div class="card-body">
+
+                    <canvas id="plotChart"></canvas>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const revenueCanvas = document.getElementById("revenueChart");
+
+    if (revenueCanvas) {
+
+        new Chart(revenueCanvas, {
+
+            type: "line",
+
+            data: {
+
+                labels: [
+                    {% for m in chart_labels %}
+                    "{{ m }}"{% if not forloop.last %},{% endif %}
+                    {% endfor %}
+                ],
+
+                datasets: [{
+
+                    label: "Revenue",
+
+                    data: [
+                        {% for v in chart_values %}
+                            {{ v }}{% if not forloop.last %},{% endif %}
+                        {% endfor %}
+                    ],
+
+                    fill: true,
+
+                    tension: 0.4
+
+                }]
+
+            }
+
+        });
+
+    }
+
+    const plotCanvas = document.getElementById("plotChart");
+
+    if (plotCanvas) {
+
+        new Chart(plotCanvas, {
+
+            type: "doughnut",
+
+            data: {
+
+                labels: ["Available", "Booked", "Sold"],
+
+                datasets: [{
+
+                    data: [
+                        {{ available_plots }},
+                        {{ booked_plots }},
+                        {{ sold_plots }}
+                    ]
+
+                }]
+
+            }
+
+        });
+
+    }
+
+});
+
+</script>
+
+{% endblock %}

@@ -1,0 +1,95 @@
+<div class="col-md-2 bg-dark text-white p-0" style="min-height:100vh;">
+
+    <div class="p-3 border-bottom">
+
+        <h4 class="text-center mb-0">
+
+            <i class="fas fa-building"></i>
+
+            ST Infra
+
+        </h4>
+
+    </div>
+
+    <div class="list-group list-group-flush">
+
+        <a href="/"
+           class="list-group-item list-group-item-action bg-dark text-white border-0">
+            <i class="fas fa-chart-line me-2"></i>
+            Dashboard
+        </a>
+
+        <a href="/employees/"
+           class="list-group-item list-group-item-action bg-dark text-white border-0">
+            <i class="fas fa-users me-2"></i>
+            Employees
+        </a>
+
+        <a href="/teams/"
+           class="list-group-item list-group-item-action bg-dark text-white border-0">
+            <i class="fas fa-user-friends me-2"></i>
+            Teams
+        </a>
+
+        <a href="/projects/"
+           class="list-group-item list-group-item-action bg-dark text-white border-0">
+            <i class="fas fa-city me-2"></i>
+            Projects
+        </a>
+
+        <a href="/leads/"
+           class="list-group-item list-group-item-action bg-dark text-white border-0">
+            <i class="fas fa-phone me-2"></i>
+            Leads
+        </a>
+
+        <a href="/bookings/"
+           class="list-group-item list-group-item-action bg-dark text-white border-0">
+            <i class="fas fa-file-signature me-2"></i>
+            Bookings
+        </a>
+
+        <a href="/payments/"
+           class="list-group-item list-group-item-action bg-dark text-white border-0">
+            <i class="fas fa-money-bill-wave me-2"></i>
+            Payments
+        </a>
+
+        <a href="/customers/"
+           class="list-group-item list-group-item-action bg-dark text-white border-0">
+            <i class="fas fa-user-check me-2"></i>
+            Customers
+        </a>
+
+        <a href="/registrations/"
+           class="list-group-item list-group-item-action bg-dark text-white border-0">
+            <i class="fas fa-file-contract me-2"></i>
+            Registrations
+        </a>
+
+        <a href="/commissions/"
+           class="list-group-item list-group-item-action bg-dark text-white border-0">
+            <i class="fas fa-hand-holding-usd me-2"></i>
+            Commissions
+        </a>
+
+        <a href="/reports/"
+           class="list-group-item list-group-item-action bg-dark text-white border-0">
+            <i class="fas fa-chart-pie me-2"></i>
+            Reports
+        </a>
+
+        {% if request.user.role == "admin" %}
+
+        <a href="/settings/"
+           class="list-group-item list-group-item-action bg-dark text-warning border-0">
+            <i class="fas fa-cogs me-2"></i>
+            Settings
+        </a>
+
+        {% endif %}
+
+    </div>
+
+</div>

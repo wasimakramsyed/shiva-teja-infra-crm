@@ -1,22 +1,256 @@
-{% extends 'base.html' %}
+{% extends 'layouts/base.html' %}
 
 {% block content %}
 
-<h2>Commission Profile</h2>
+<div class="container-fluid">
 
-<div class="card shadow-sm p-4">
+    <div class="card shadow">
 
-    <p><strong>Commission ID:</strong> {{ commission.commission_id }}</p>
-    <p><strong>Employee:</strong> {{ commission.employee.first_name }} {{ commission.employee.surname }}</p>
-    <p><strong>Designation:</strong> {{ commission.employee.designation }}</p>
-    <p><strong>Payment ID:</strong> {{ commission.payment.payment_id }}</p>
-    <p><strong>Commission %:</strong> {{ commission.commission_percentage }}%</p>
-    <p><strong>Gross Commission:</strong> ₹{{ commission.commission_amount }}</p>
-    <p><strong>TDS:</strong> ₹{{ commission.tds }}</p>
-    <p><strong>Net Commission:</strong> ₹{{ commission.net_commission }}</p>
-    <p><strong>Status:</strong> {{ commission.status }}</p>
-    <p><strong>Paid Date:</strong> {{ commission.paid_date }}</p>
-    <p><strong>Remarks:</strong> {{ commission.remarks }}</p>
+        <div class="card-header bg-primary text-white">
+
+            <h3>Commission Details</h3>
+
+        </div>
+
+        <div class="card-body">
+
+            <div class="row">
+
+                <div class="col-md-6">
+
+                    <h5 class="mb-3">Basic Information</h5>
+
+                    <table class="table table-bordered">
+
+                        <tr>
+                            <th>Commission ID</th>
+                            <td>{{ commission.commission_id }}</td>
+                        </tr>
+
+                        <tr>
+                            <th>Booking</th>
+                            <td>{{ commission.booking.booking_id }}</td>
+                        </tr>
+
+                        <tr>
+                            <th>Customer</th>
+                            <td>{{ commission.customer.customer_name }}</td>
+                        </tr>
+
+                        <tr>
+                            <th>Booking Value</th>
+                            <td>₹{{ commission.booking_value }}</td>
+                        </tr>
+
+                        <tr>
+                            <th>Policy</th>
+                            <td>{{ commission.policy.policy_name }}</td>
+                        </tr>
+
+                        <tr>
+                            <th>Status</th>
+
+                            <td>
+
+                                {% if commission.status == "generated" %}
+                                    <span class="badge bg-warning">Generated</span>
+                                {% elif commission.status == "approved" %}
+                                    <span class="badge bg-primary">Approved</span>
+                                {% elif commission.status == "paid" %}
+                                    <span class="badge bg-success">Paid</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">
+                                        {{ commission.status }}
+                                    </span>
+                                {% endif %}
+
+                            </td>
+
+                        </tr>
+
+                    </table>
+
+                </div>
+
+                <div class="col-md-6">
+
+                    <h5 class="mb-3">Employee Commission</h5>
+
+                    <table class="table table-bordered">
+
+                        <tr>
+                            <th>Employee</th>
+                            <td>
+
+                                {% if commission.employee %}
+                                    {{ commission.employee.first_name }}
+                                    {{ commission.employee.surname }}
+                                {% else %}
+                                    -
+                                {% endif %}
+
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <th>Percentage</th>
+                            <td>{{ commission.employee_percentage }}%</td>
+                        </tr>
+
+                        <tr>
+                            <th>Gross</th>
+                            <td>₹{{ commission.employee_gross }}</td>
+                        </tr>
+
+                        <tr>
+                            <th>TDS</th>
+                            <td>₹{{ commission.employee_tds }}</td>
+                        </tr>
+
+                        <tr>
+                            <th>GST</th>
+                            <td>₹{{ commission.employee_gst }}</td>
+                        </tr>
+
+                        <tr>
+                            <th>Net Payable</th>
+                            <td>
+                                <strong>
+                                    ₹{{ commission.employee_net }}
+                                </strong>
+                            </td>
+                        </tr>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+            <hr>
+
+            <div class="row">
+
+                <div class="col-md-6">
+
+                    <h5 class="mb-3">Team Commission</h5>
+
+                    <table class="table table-bordered">
+
+                        <tr>
+                            <th>Team</th>
+                            <td>
+
+                                {% if commission.team %}
+                                    {{ commission.team.team_name }}
+                                {% else %}
+                                    -
+                                {% endif %}
+
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <th>Percentage</th>
+                            <td>{{ commission.team_percentage }}%</td>
+                        </tr>
+
+                        <tr>
+                            <th>Gross</th>
+                            <td>₹{{ commission.team_gross }}</td>
+                        </tr>
+
+                        <tr>
+                            <th>TDS</th>
+                            <td>₹{{ commission.team_tds }}</td>
+                        </tr>
+
+                        <tr>
+                            <th>GST</th>
+                            <td>₹{{ commission.team_gst }}</td>
+                        </tr>
+
+                        <tr>
+                            <th>Net Payable</th>
+                            <td>
+                                <strong>
+                                    ₹{{ commission.team_net }}
+                                </strong>
+                            </td>
+                        </tr>
+
+                    </table>
+
+                </div>
+
+                <div class="col-md-6">
+
+                    <h5 class="mb-3">Approval Details</h5>
+
+                    <table class="table table-bordered">
+
+                        <tr>
+                            <th>Approved By</th>
+                            <td>{{ commission.approved_by }}</td>
+                        </tr>
+
+                        <tr>
+                            <th>Approved At</th>
+                            <td>{{ commission.approved_at }}</td>
+                        </tr>
+
+                        <tr>
+                            <th>Paid At</th>
+                            <td>{{ commission.paid_at }}</td>
+                        </tr>
+
+                        <tr>
+                            <th>Remarks</th>
+                            <td>{{ commission.remarks }}</td>
+                        </tr>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+            <div class="mt-4">
+
+                <a
+                    href="{% url 'commission_list' %}"
+                    class="btn btn-secondary"
+                >
+                    Back
+                </a>
+
+                {% if commission.status == "generated" %}
+
+                    <a
+                        href="{% url 'approve_commission' commission.id %}"
+                        class="btn btn-success"
+                    >
+                        Approve Commission
+                    </a>
+
+                {% endif %}
+
+                {% if commission.status == "approved" %}
+
+                    <a
+                        href="{% url 'mark_commission_paid' commission.id %}"
+                        class="btn btn-primary"
+                    >
+                        Mark as Paid
+                    </a>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+    </div>
 
 </div>
 

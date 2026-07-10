@@ -62,27 +62,53 @@ def create_customer(request):
     )
 
 
-@role_required(['admin', 'manager', 'sales'])
+@role_required(["admin", "manager", "sales"])
 def customer_profile(request, customer_id):
+
     customer = get_object_or_404(
         Customer,
         id=customer_id
     )
 
-    payments = customer.booking.payments.all()
+    booking = customer.booking
 
-    commissions = Commission.objects.filter(
-        payment__booking=customer.booking
+    payments = booking.payments.all().order_by(
+        "-payment_date"
     )
+
+    commission = Commission.objects.filter(
+        booking=booking
+    ).first()
+
+    registration = getattr(
+        booking,
+        "registration",
+        None
+    )
+
+    total_paid = (
+        booking.advance_amount +
+        sum(
+            p.amount
+            for p in payments
+        )
+    )
+
+    pending = booking.booking_amount - total_paid
 
     return render(
         request,
-        'customers/customer_profile.html',
+        "customers/customer_profile.html",
         {
-            'customer': customer,
-            'payments': payments,
-            'commissions': commissions
-        }
+            "customer": customer,
+            "booking": booking,
+            "payments": payments,
+            "commission": commission,
+            "registration": registration,
+            "total_paid": total_paid,
+            "pending": pending,
+            "activities": booking.activities.all(),
+        },
     )
 
 

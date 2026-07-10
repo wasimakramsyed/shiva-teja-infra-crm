@@ -4,7 +4,8 @@ from .views import (
     create_lead,
     lead_profile,
     edit_lead,
-    convert_lead
+    convert_lead,
+    get_lead_details,
 )
 
 urlpatterns = [
@@ -33,8 +34,14 @@ urlpatterns = [
     ),
 
     path(
-        'leads/convert/<int:lead_id>/',
-        convert_lead,
-        name='convert_lead'
+    'leads/convert/<int:lead_id>/',
+    convert_lead,
+    name='convert_lead'
+    ),
+
+    path(
+    "ajax/get-lead-details/",
+    get_lead_details,
+    name="get_lead_details",
     ),
 ]

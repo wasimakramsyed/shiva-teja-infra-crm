@@ -1,101 +1,161 @@
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import (
+    render,
+    redirect,
+    get_object_or_404,
+)
+
+from django.db.models import Q
+from django.contrib import messages
+
 from .models import Commission
-from .forms import CommissionForm
+from .services.commission_service import CommissionService
+
 from accounts.decorators import role_required
-from notifications.models import Notification
 
 
-@role_required(['admin', 'accounts', 'manager'])
+# ==========================================================
+# Commission List
+# ==========================================================
+
+@role_required(["admin", "accounts", "manager"])
 def commission_list(request):
-    query = request.GET.get('q')
-    status_filter = request.GET.get('status')
 
-    commissions = Commission.objects.all()
+    query = request.GET.get("q", "")
+    status_filter = request.GET.get("status")
+
+    commissions = Commission.objects.select_related(
+        "booking",
+        "customer",
+        "employee",
+        "team",
+        "policy",
+    )
 
     if query:
+
         commissions = commissions.filter(
-            commission_id__icontains=query
+
+            Q(commission_id__icontains=query) |
+
+            Q(booking__booking_id__icontains=query) |
+
+            Q(customer__customer_name__icontains=query)
+
         )
 
     if status_filter:
+
         commissions = commissions.filter(
             status=status_filter
         )
 
     return render(
         request,
-        'commissions/commission_list.html',
+        "commissions/commission_list.html",
         {
-            'commissions': commissions,
-            'query': query,
-            'status_filter': status_filter
-        }
+            "commissions": commissions,
+            "query": query,
+            "status_filter": status_filter,
+        },
     )
 
 
-@role_required(['admin', 'accounts'])
-def create_commission(request):
-    form = CommissionForm(
-        request.POST or None
+# ==========================================================
+# Commission Profile
+# ==========================================================
+
+@role_required(["admin", "accounts", "manager"])
+def commission_profile(request, commission_id):
+
+    commission = get_object_or_404(
+        Commission,
+        id=commission_id,
     )
 
-    if form.is_valid():
-        commission = form.save()
+    return render(
+        request,
+        "commissions/commission_profile.html",
+        {
+            "commission": commission,
+        },
+    )
 
-        Notification.objects.create(
-            message=(
-                f"Commission created: "
-                f"{commission.commission_id}"
-            )
+
+# ==========================================================
+# Approve Commission
+# ==========================================================
+
+@role_required(["admin", "accounts"])
+def approve_commission(request, commission_id):
+
+    commission = get_object_or_404(
+        Commission,
+        id=commission_id,
+    )
+
+    if commission.status != "generated":
+
+        messages.warning(
+            request,
+            "Only generated commissions can be approved."
         )
 
-        return redirect('/commissions/')
+        return redirect(
+            "commission_profile",
+            commission_id=commission.id
+        )
 
-    return render(
+    CommissionService.approve_commission(
+        commission,
+        request.user
+    )
+
+    messages.success(
         request,
-        'commissions/create_commission.html',
-        {
-            'form': form
-        }
+        "Commission approved successfully."
+    )
+
+    return redirect(
+        "commission_profile",
+        commission_id=commission.id
     )
 
 
-@role_required(['admin', 'accounts', 'manager'])
-def commission_profile(request, commission_id):
+# ==========================================================
+# Mark Commission Paid
+# ==========================================================
+
+@role_required(["admin", "accounts"])
+def mark_commission_paid(request, commission_id):
+
     commission = get_object_or_404(
         Commission,
-        id=commission_id
+        id=commission_id,
     )
 
-    return render(
+    if commission.status != "approved":
+
+        messages.warning(
+            request,
+            "Only approved commissions can be marked as paid."
+        )
+
+        return redirect(
+            "commission_profile",
+            commission_id=commission.id
+        )
+
+    CommissionService.mark_paid(
+        commission,
+        request.user
+    )
+
+    messages.success(
         request,
-        'commissions/commission_profile.html',
-        {
-            'commission': commission
-        }
+        "Commission marked as paid."
     )
 
-
-@role_required(['admin', 'accounts'])
-def edit_commission(request, commission_id):
-    commission = get_object_or_404(
-        Commission,
-        id=commission_id
-    )
-
-    form = CommissionForm(
-        request.POST or None,
-        instance=commission
-    )
-
-    if form.is_valid():
-        form.save()
-        return redirect('/commissions/')
-
-    return render(
-        request,
-        'commissions/create_commission.html',
-        {
-            'form': form
-        }
+    return redirect(
+        "commission_profile",
+        commission_id=commission.id
     )

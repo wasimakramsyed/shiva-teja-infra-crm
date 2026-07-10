@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'layouts/base.html' %}
 
 {% block content %}
 
@@ -6,14 +6,7 @@
 
 <hr>
 
-<h4>Commission Actions</h4>
-
-<a
-    href="/commissions/create/?booking={{ customer.booking.id }}"
-    class="btn btn-warning"
->
-    Assign Commission
-</a>
+ 
 <div class="card shadow-sm p-4">
 
     <p><strong>Customer ID:</strong> {{ customer.customer_id }}</p>
@@ -44,7 +37,28 @@
     <p><strong>Status:</strong> {{ customer.ownership_status }}</p>
 
     <hr>
+<hr>
 
+<h4>Payment Summary</h4>
+
+<table class="table table-bordered">
+
+    <tr>
+        <th>Booking Amount</th>
+        <td>₹{{ booking.booking_amount }}</td>
+    </tr>
+
+    <tr>
+        <th>Total Paid</th>
+        <td>₹{{ total_paid }}</td>
+    </tr>
+
+    <tr>
+        <th>Pending Amount</th>
+        <td>₹{{ pending }}</td>
+    </tr>
+
+</table>
     <h4>Payment History</h4>
 
     {% for payment in payments %}
@@ -58,5 +72,58 @@
     {% endfor %}
 
 </div>
+<hr>
+
+<h4>Commission Details</h4>
+
+{% if commission %}
+
+<table class="table table-bordered">
+
+    <tr>
+        <th>Commission ID</th>
+        <td>{{ commission.commission_id }}</td>
+    </tr>
+
+    <tr>
+        <th>Status</th>
+        <td>{{ commission.status }}</td>
+    </tr>
+
+    <tr>
+        <th>Employee</th>
+        <td>
+
+            {% if commission.employee %}
+                {{ commission.employee.first_name }}
+                {{ commission.employee.surname }}
+            {% else %}
+                -
+            {% endif %}
+
+        </td>
+    </tr>
+
+    <tr>
+        <th>Employee Net</th>
+        <td>₹{{ commission.employee_net }}</td>
+    </tr>
+
+    <tr>
+        <th>Team Net</th>
+        <td>₹{{ commission.team_net }}</td>
+    </tr>
+
+</table>
+
+{% else %}
+
+<div class="alert alert-info">
+
+    Commission not generated yet.
+
+</div>
+
+{% endif %}
 
 {% endblock %}

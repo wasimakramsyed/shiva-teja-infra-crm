@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'layouts/base.html' %}
 
 {% block content %}
 
@@ -80,8 +80,12 @@
             </a>
         </td>
         <td>
-                <a href="/bookings/{{ booking.id }}/">View</a> |
-                <a href="/bookings/edit/{{ booking.id }}/">Edit</a>
+            <a href="{% url 'booking_profile' booking.id %}">View</a>
+            <a href="{% url 'edit_booking' booking.id %}">Edit</a>
+
+            <a href="{% url 'print_booking' booking.id %}">
+                Print
+            </a>
             </td>
         </tr>
         {% empty %}
