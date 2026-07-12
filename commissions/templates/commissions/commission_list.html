@@ -1,240 +1,352 @@
-{% extends 'layouts/base.html' %}
+{% extends "layouts/base.html" %}
 
 {% block content %}
 
 <div class="container-fluid">
 
-    <div class="card shadow">
+<div class="d-flex justify-content-between align-items-center mb-4">
 
-        <div class="card-header bg-primary text-white">
+    <div>
 
-            <h3>Commission List</h3>
+        <h2>
+            <i class="fas fa-money-check-alt text-success"></i>
+            Generated Commissions
+        </h2>
 
-        </div>
+        <small class="text-muted">
+            Manage all generated commissions
+        </small>
 
-        <div class="card-body">
+    </div>
 
-            <form method="GET" class="row mb-4">
+</div>
 
-                <div class="col-md-5">
+<!-- Summary Cards -->
 
-                    <input
-                        type="text"
-                        name="q"
-                        value="{{ query }}"
-                        placeholder="Search Commission / Booking / Customer"
-                        class="form-control"
-                    >
+<div class="row mb-4">
 
-                </div>
+    <div class="col-md-3">
 
-                <div class="col-md-3">
+        <div class="card shadow-sm border-start border-primary border-4">
 
-                    <select
-                        name="status"
-                        class="form-select"
-                    >
+            <div class="card-body">
 
-                        <option value="">All Status</option>
+                <h6 class="text-muted">Generated</h6>
 
-                        <option value="generated"
-                            {% if status_filter == "generated" %}
-                                selected
-                            {% endif %}
-                        >
-                            Generated
-                        </option>
+                <h3>{{ generated_count }}</h3>
 
-                        <option value="approved"
-                            {% if status_filter == "approved" %}
-                                selected
-                            {% endif %}
-                        >
-                            Approved
-                        </option>
-
-                        <option value="paid"
-                            {% if status_filter == "paid" %}
-                                selected
-                            {% endif %}
-                        >
-                            Paid
-                        </option>
-
-                    </select>
-
-                </div>
-
-                <div class="col-md-2">
-
-                    <button class="btn btn-primary w-100">
-
-                        Search
-
-                    </button>
-
-                </div>
-
-            </form>
-
-            <table class="table table-hover table-bordered">
-
-                <thead class="table-dark">
-
-                    <tr>
-
-                        <th>ID</th>
-
-                        <th>Booking</th>
-
-                        <th>Customer</th>
-
-                        <th>Employee</th>
-
-                        <th>Team</th>
-
-                        <th>Net Commission</th>
-
-                        <th>Status</th>
-
-                        <th width="260">Actions</th>
-
-                    </tr>
-
-                </thead>
-
-                <tbody>
-
-                    {% for commission in commissions %}
-
-                    <tr>
-
-                        <td>{{ commission.commission_id }}</td>
-
-                        <td>{{ commission.booking.booking_id }}</td>
-
-                        <td>{{ commission.customer.customer_name }}</td>
-
-                        <td>
-
-                            {% if commission.employee %}
-                                {{ commission.employee.first_name }}
-                            {% else %}
-                                -
-                            {% endif %}
-
-                        </td>
-
-                        <td>
-
-                            {% if commission.team %}
-                                {{ commission.team.team_name }}
-                            {% else %}
-                                -
-                            {% endif %}
-
-                        </td>
-
-                        <td>
-
-                            ₹{{ commission.employee_net|add:commission.team_net }}
-
-                        </td>
-
-                        <td>
-
-                            {% if commission.status == "generated" %}
-
-                                <span class="badge bg-warning">
-
-                                    Generated
-
-                                </span>
-
-                            {% elif commission.status == "approved" %}
-
-                                <span class="badge bg-primary">
-
-                                    Approved
-
-                                </span>
-
-                            {% elif commission.status == "paid" %}
-
-                                <span class="badge bg-success">
-
-                                    Paid
-
-                                </span>
-
-                            {% else %}
-
-                                <span class="badge bg-secondary">
-
-                                    {{ commission.status }}
-
-                                </span>
-
-                            {% endif %}
-
-                        </td>
-
-                        <td>
-
-                            <a
-                                href="{% url 'commission_profile' commission.id %}"
-                                class="btn btn-sm btn-info"
-                            >
-                                View
-                            </a>
-
-                            {% if commission.status == "generated" %}
-
-                                <a
-                                    href="{% url 'approve_commission' commission.id %}"
-                                    class="btn btn-sm btn-success"
-                                >
-                                    Approve
-                                </a>
-
-                            {% endif %}
-
-                            {% if commission.status == "approved" %}
-
-                                <a
-                                    href="{% url 'mark_commission_paid' commission.id %}"
-                                    class="btn btn-sm btn-primary"
-                                >
-                                    Mark Paid
-                                </a>
-
-                            {% endif %}
-
-                        </td>
-
-                    </tr>
-
-                    {% empty %}
-
-                    <tr>
-
-                        <td colspan="8" class="text-center">
-
-                            No commissions found.
-
-                        </td>
-
-                    </tr>
-
-                    {% endfor %}
-
-                </tbody>
-
-            </table>
+            </div>
 
         </div>
 
     </div>
+
+    <div class="col-md-3">
+
+        <div class="card shadow-sm border-start border-warning border-4">
+
+            <div class="card-body">
+
+                <h6 class="text-muted">Approved</h6>
+
+                <h3>{{ approved_count }}</h3>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-md-3">
+
+        <div class="card shadow-sm border-start border-success border-4">
+
+            <div class="card-body">
+
+                <h6 class="text-muted">Paid</h6>
+
+                <h3>{{ paid_count }}</h3>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-md-3">
+
+        <div class="card shadow-sm border-start border-info border-4">
+
+            <div class="card-body">
+
+                <h6 class="text-muted">
+
+                    Total Commission
+
+                </h6>
+
+                <h4>
+
+                    ₹{{ total_commission }}
+
+                </h4>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- Filters -->
+
+<div class="card shadow mb-4">
+
+<div class="card-body">
+
+<form method="GET">
+
+<div class="row">
+
+<div class="col-md-4">
+
+<input
+type="text"
+name="q"
+class="form-control"
+placeholder="Search Booking / Customer"
+value="{{ query }}">
+
+</div>
+
+<div class="col-md-3">
+
+<select
+name="status"
+class="form-select">
+
+<option value="">
+
+All Status
+
+</option>
+
+<option value="generated"
+{% if status == "generated" %}
+selected
+{% endif %}>
+
+Generated
+
+</option>
+
+<option value="approved"
+{% if status == "approved" %}
+selected
+{% endif %}>
+
+Approved
+
+</option>
+
+<option value="paid"
+{% if status == "paid" %}
+selected
+{% endif %}>
+
+Paid
+
+</option>
+
+</select>
+
+</div>
+
+<div class="col-md-3">
+
+<select
+name="project"
+class="form-select">
+
+<option value="">
+
+All Projects
+
+</option>
+
+{% for p in projects %}
+
+<option
+value="{{ p.id }}"
+{% if project == p.id|stringformat:"s" %}
+selected
+{% endif %}>
+
+{{ p.project_name }}
+
+</option>
+
+{% endfor %}
+
+</select>
+
+</div>
+
+<div class="col-md-2 d-grid">
+
+<button
+class="btn btn-primary">
+
+Search
+
+</button>
+
+</div>
+
+</div>
+
+</form>
+
+</div>
+
+</div>
+
+<!-- Table -->
+
+<div class="card shadow">
+
+<div class="card-body">
+
+<table class="table table-hover align-middle">
+
+<thead class="table-dark">
+
+<tr>
+
+<th>Request</th>
+
+<th>Booking</th>
+
+<th>Customer</th>
+
+<th>Project</th>
+
+<th>Net Commission</th>
+
+<th>Status</th>
+
+<th>Action</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+{% for commission in commissions %}
+
+<tr>
+
+<td>
+
+{{ commission.request.request_id }}
+
+</td>
+
+<td>
+
+{{ commission.booking.booking_id }}
+
+</td>
+
+<td>
+
+{{ commission.customer.customer_name }}
+
+</td>
+
+<td>
+
+{{ commission.project.project_name }}
+
+</td>
+
+<td>
+
+₹{{ commission.net_commission }}
+
+</td>
+
+<td>
+
+{% if commission.status == "generated" %}
+
+<span class="badge bg-primary">
+
+Generated
+
+</span>
+
+{% elif commission.status == "approved" %}
+
+<span class="badge bg-warning text-dark">
+
+Approved
+
+</span>
+
+{% elif commission.status == "paid" %}
+
+<span class="badge bg-success">
+
+Paid
+
+</span>
+
+{% endif %}
+
+</td>
+
+<td>
+
+<a
+href="{% url 'commission_profile' commission.id %}"
+class="btn btn-sm btn-outline-primary">
+
+<i class="fas fa-eye"></i>
+
+View
+
+</a>
+
+</td>
+
+</tr>
+
+{% empty %}
+
+<tr>
+
+<td
+colspan="7"
+class="text-center">
+
+No commission records found.
+
+</td>
+
+</tr>
+
+{% endfor %}
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
 
 </div>
 

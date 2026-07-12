@@ -1,30 +1,66 @@
 from django import forms
-from .models import Commission
+ 
+
+# ==============================
+# Legacy Commission Form
+# ==============================
+
+ 
 
 
-class CommissionForm(forms.ModelForm):
+# ==============================
+# New Commission Generation Form
+# ==============================
 
-    class Meta:
+class CommissionGenerationForm(forms.Form):
 
-        model = Commission
+    commission_percentage = forms.DecimalField(
+        label="Commission %",
+        max_digits=5,
+        decimal_places=2,
+        min_value=0,
+        widget=forms.NumberInput(
+            attrs={
+                "class": "form-control",
+                "step": "0.01",
+                "placeholder": "Enter Commission %",
+            }
+        ),
+    )
 
-        fields = [
-            "remarks",
-            "status",
-        ]
+    tds_percentage = forms.DecimalField(
+        label="TDS %",
+        max_digits=5,
+        decimal_places=2,
+        initial=10,
+        widget=forms.NumberInput(
+            attrs={
+                "class": "form-control",
+                "step": "0.01",
+            }
+        ),
+    )
 
-        widgets = {
+    other_deduction = forms.DecimalField(
+        label="Other Deduction",
+        required=False,
+        initial=0,
+        decimal_places=2,
+        max_digits=12,
+        widget=forms.NumberInput(
+            attrs={
+                "class": "form-control",
+            }
+        ),
+    )
 
-            "remarks": forms.Textarea(
-                attrs={
-                    "class": "form-control",
-                    "rows": 3,
-                }
-            ),
-
-            "status": forms.Select(
-                attrs={
-                    "class": "form-select",
-                }
-            ),
-        }
+    remarks = forms.CharField(
+        required=False,
+        widget=forms.Textarea(
+            attrs={
+                "class": "form-control",
+                "rows": 3,
+                "placeholder": "Optional Remarks",
+            }
+        ),
+    )

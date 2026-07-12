@@ -2,16 +2,340 @@
 
 {% block content %}
 
-<h2 class="mb-4">Create Payment</h2>
+<div class="container-fluid">
 
-<form method="POST" enctype="multipart/form-data">
-    {% csrf_token %}
+    <!-- Page Header -->
 
-    {{ form.as_p }}
+    <div class="d-flex justify-content-between align-items-center mb-4">
 
-    <button type="submit" class="btn btn-success">
-        Save Payment
-    </button>
-</form>
+        <div>
+
+            <h2 class="fw-bold mb-0">
+                <i class="fas fa-money-check-alt text-success"></i>
+                Receive Payment
+            </h2>
+
+            <small class="text-muted">
+                Record customer payments
+            </small>
+
+        </div>
+
+    </div>
+
+    <form method="POST">
+
+        {% csrf_token %}
+
+        <div class="row">
+
+            <!-- ================================= -->
+            <!-- Payment Form -->
+            <!-- ================================= -->
+
+            <div class="col-lg-7">
+
+                <div class="card shadow-sm border-0">
+
+                    <div class="card-header bg-white">
+
+                        <h5 class="mb-0">
+
+                            Payment Information
+
+                        </h5>
+
+                    </div>
+
+                    <div class="card-body">
+
+                        <div class="mb-3">
+
+                            {{ form.booking.label_tag }}
+
+                            {{ form.booking }}
+
+                        </div>
+
+                        <div class="mb-3">
+
+                            {{ form.payment_date.label_tag }}
+
+                            {{ form.payment_date }}
+
+                        </div>
+
+                        <div class="mb-3">
+
+                            {{ form.amount.label_tag }}
+
+                            {{ form.amount }}
+
+                        </div>
+
+                        <div class="mb-3">
+
+                            {{ form.payment_mode.label_tag }}
+
+                            {{ form.payment_mode }}
+
+                        </div>
+
+                        <div class="mb-3">
+
+                            {{ form.remarks.label_tag }}
+
+                            {{ form.remarks }}
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- ================================= -->
+            <!-- Booking Summary -->
+            <!-- ================================= -->
+
+            <div class="col-lg-5">
+
+                <div class="card shadow-sm border-0">
+
+                    <div class="card-header bg-primary text-white">
+
+                        <h5 class="mb-0">
+
+                            <i class="fas fa-file-invoice"></i>
+
+                            Booking Summary
+
+                        </h5>
+
+                    </div>
+
+                    <div class="card-body">
+
+                        <table class="table table-borderless mb-0">
+
+                            <tr>
+
+                                <th width="45%">Customer</th>
+
+                                <td id="customerName">
+                                    -
+                                </td>
+
+                            </tr>
+
+                            <tr>
+
+                                <th>Project</th>
+
+                                <td id="projectName">
+                                    -
+                                </td>
+
+                            </tr>
+
+                            <tr>
+
+                                <th>Plot</th>
+
+                                <td id="plotNumber">
+                                    -
+                                </td>
+
+                            </tr>
+
+                            <tr>
+
+                                <th>Total Plot Price</th>
+
+                                <td id="bookingAmount">
+                                    ₹0
+                                </td>
+
+                            </tr>
+
+                            <tr>
+
+                                <th>Booking Advance</th>
+
+                                <td id="advanceAmount">
+                                    ₹0
+                                </td>
+
+                            </tr>
+
+                            <tr>
+
+                                <th>Total Paid</th>
+
+                                <td id="totalPaid">
+                                    ₹0
+                                </td>
+
+                            </tr>
+
+                            <tr>
+
+                                <th class="text-danger">
+
+                                    Remaining
+
+                                </th>
+
+                                <td
+                                    id="remainingAmount"
+                                    class="fw-bold text-danger"
+                                >
+
+                                    ₹0
+
+                                </td>
+
+                            </tr>
+
+                            <tr>
+
+                                <th>Status</th>
+
+                                <td id="bookingStatus">
+
+                                    -
+
+                                </td>
+
+                            </tr>
+
+                        </table>
+
+                        <div
+                            id="paymentWarning"
+                            class="alert alert-danger mt-3 d-none"
+                        >
+
+                            <i class="fas fa-exclamation-triangle"></i>
+
+                            This booking is already fully paid.
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Buttons -->
+
+        <div class="mt-4 text-end">
+
+            <a
+                href="{% url 'payment_list' %}"
+                class="btn btn-secondary"
+            >
+
+                Cancel
+
+            </a>
+
+            <button
+                id="saveBtn"
+                class="btn btn-success"
+            >
+
+                <i class="fas fa-save"></i>
+
+                Save Payment
+
+            </button>
+
+        </div>
+
+    </form>
+
+</div>
+
+<script>
+
+const bookingField = document.getElementById("id_booking");
+
+const saveBtn = document.getElementById("saveBtn");
+
+const warning = document.getElementById("paymentWarning");
+
+bookingField.addEventListener("change", function(){
+
+    if(!this.value){
+
+        return;
+
+    }
+
+    fetch(`/ajax/payment-booking-details/?booking_id=${this.value}`)
+
+    .then(response => response.json())
+
+    .then(data => {
+
+        if(!data.success){
+
+            return;
+
+        }
+
+        document.getElementById("customerName").innerText = data.customer;
+
+        document.getElementById("projectName").innerText = data.project;
+
+        document.getElementById("plotNumber").innerText = data.plot;
+
+        document.getElementById("bookingAmount").innerText =
+            "₹" + data.booking_amount;
+
+        document.getElementById("advanceAmount").innerText =
+            "₹" + data.advance;
+
+        document.getElementById("totalPaid").innerText =
+            "₹" + data.total_paid;
+
+        document.getElementById("remainingAmount").innerText =
+            "₹" + data.remaining;
+
+        document.getElementById("bookingStatus").innerHTML =
+            `<span class="badge bg-info">${data.status}</span>`;
+
+        if(parseFloat(data.remaining) <= 0){
+
+            warning.classList.remove("d-none");
+
+            saveBtn.disabled = true;
+
+        }
+
+        else{
+
+            warning.classList.add("d-none");
+
+            saveBtn.disabled = false;
+
+        }
+
+    });
+
+});
+
+if(bookingField.value){
+
+    bookingField.dispatchEvent(new Event("change"));
+
+}
+
+</script>
 
 {% endblock %}

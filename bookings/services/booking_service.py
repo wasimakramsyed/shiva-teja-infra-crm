@@ -2,6 +2,8 @@ from django.db import transaction
 from django.core.exceptions import ValidationError
 from bookings.services.activity_service import ActivityService
 from bookings.models import Booking
+from customers.models import Customer
+from activities.activity_service import ActivityService as CRMActivityService
 from leads.models import Lead
 from projects.models import Plot
 
@@ -92,5 +94,37 @@ class BookingService:
     description=f"Plot {plot.plot_number} reserved.",
     user=user
 )
+
+        customer, _ = Customer.objects.get_or_create(
+            mobile_number=booking.mobile_number,
+            defaults={
+                "customer_name": booking.booked_client_name,
+            },
+        )
+
+        CRMActivityService.create_activity(
+
+            customer=customer,
+
+            booking=booking,
+
+            activity_type="booking",
+
+            title="Booking Created",
+
+            description=(
+                f"Booking {booking.booking_id} created for "
+                f"{booking.booked_client_name}."
+            ),
+
+            created_by=user,
+
+            icon="fas fa-calendar-check",
+
+            color="blue",
+
+            is_system_generated=True,
+
+        )
 
         return booking

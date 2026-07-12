@@ -17,6 +17,13 @@ class Booking(models.Model):
         ("registered", "Registered"),
         ("cancelled", "Cancelled"),
     ]
+    WORKFLOW_STATUS_CHOICES = [
+        ("booked", "Booked"),
+        ("commission_ready", "Commission Ready"),
+        ("commission_generated", "Commission Generated"),
+        ("commission_paid", "Commission Paid"),
+        ("registered", "Registered"),
+]
 
     BOOKING_SOURCE_CHOICES = [
         ("lead", "Lead"),
@@ -148,6 +155,11 @@ class Booking(models.Model):
     status = models.CharField(
         max_length=20,
         choices=STATUS_CHOICES,
+        default="booked"
+    )
+    workflow_status = models.CharField(
+        max_length=30,
+        choices=WORKFLOW_STATUS_CHOICES,
         default="booked"
     )
 

@@ -1,54 +1,66 @@
-from registrations.services.registration_service import RegistrationService
-from django.contrib import messages
-from django.core.exceptions import ValidationError
+{% extends "layouts/base.html" %}
 
+{% block content %}
 
-@role_required(["admin", "manager"])
-def create_registration(request):
+<div class="container-fluid">
 
-    form = RegistrationForm(
-        request.POST or None,
-        request.FILES or None
-    )
+<div class="d-flex justify-content-between align-items-center mb-4">
 
-    if request.method == "POST":
+    <div>
+        <h2>
+            <i class="fas fa-file-signature text-primary"></i>
+            New Registration
+        </h2>
+        <small class="text-muted">
+            Register a booked property
+        </small>
+    </div>
 
-        if form.is_valid():
+    <a href="{% url 'registration_list' %}"
+       class="btn btn-outline-secondary">
 
-            try:
+        <i class="fas fa-arrow-left"></i>
 
-                registration = RegistrationService.register_property(
-                    form=form,
-                    user=request.user
-                )
+        Back
 
-                messages.success(
-                    request,
-                    f"Registration {registration.registration_id} completed successfully."
-                )
+    </a>
 
-                return redirect(
-                    "registration_list"
-                )
+</div>
 
-            except ValidationError as e:
+<div class="card shadow">
 
-                messages.error(
-                    request,
-                    str(e)
-                )
+<div class="card-body">
 
-        else:
+<form method="POST" enctype="multipart/form-data">
 
-            messages.error(
-                request,
-                "Please correct the errors below."
-            )
+    {% csrf_token %}
 
-    return render(
-        request,
-        "registrations/create_registration.html",
-        {
-            "form": form
-        }
-    )
+    {{ form.as_p }}
+
+    <hr>
+
+    <button type="submit"
+            class="btn btn-primary">
+
+        <i class="fas fa-save"></i>
+
+        Save Registration
+
+    </button>
+
+    <a href="{% url 'registration_list' %}"
+       class="btn btn-secondary">
+
+        Cancel
+
+    </a>
+
+</form>
+
+</div>
+
+</div>
+
+</div>
+
+{% endblock %}

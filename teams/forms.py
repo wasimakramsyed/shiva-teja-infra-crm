@@ -34,25 +34,41 @@ class TeamForm(forms.ModelForm):
         ]
 
         widgets = {
-            'team_name': forms.TextInput(
-                attrs={
-                    'class': 'form-control'
-                }
-            ),
 
-            'description': forms.Textarea(
-                attrs={
-                    'class': 'form-control',
-                    'rows': 3
-                }
-            ),
-
-            'status': forms.Select(
-                attrs={
-                    'class': 'form-control'
-                }
-            ),
+    "team_name": forms.TextInput(
+        attrs={
+            "class":"form-control",
+            "placeholder":"Enter Team Name"
         }
+    ),
+
+    "description": forms.Textarea(
+        attrs={
+            "class":"form-control",
+            "rows":4,
+            "placeholder":"Enter Description"
+        }
+    ),
+
+    "status": forms.Select(
+        attrs={
+            "class":"form-select"
+        }
+    ),
+
+    "team_head": forms.Select(
+        attrs={
+            "class":"form-select"
+        }
+    ),
+
+    "members": forms.SelectMultiple(
+        attrs={
+            "class":"form-select"
+        }
+    ),
+
+}
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

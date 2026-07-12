@@ -1,0 +1,223 @@
+{% extends "layouts/base.html" %}
+
+{% block content %}
+
+<div class="container-fluid">
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+
+<div>
+
+<h2>
+
+{{ registration.registration_id }}
+
+</h2>
+
+<small class="text-muted">
+
+Registration Workspace
+
+</small>
+
+</div>
+
+<a href="{% url 'registration_list' %}"
+
+class="btn btn-outline-secondary">
+
+Back
+
+</a>
+
+</div>
+
+<div class="row">
+
+<div class="col-lg-8">
+
+<div class="card shadow mb-4">
+
+<div class="card-header">
+
+Customer Information
+
+</div>
+
+<div class="card-body">
+
+<table class="table">
+
+<tr>
+
+<th>Customer</th>
+
+<td>{{ registration.customer }}</td>
+
+</tr>
+
+<tr>
+
+<th>Booking</th>
+
+<td>{{ registration.booking.booking_id }}</td>
+
+</tr>
+
+<tr>
+
+<th>Project</th>
+
+<td>{{ registration.booking.project }}</td>
+
+</tr>
+
+<tr>
+
+<th>Plot</th>
+
+<td>{{ registration.booking.plot }}</td>
+
+</tr>
+
+<tr>
+
+<th>Registration Date</th>
+
+<td>{{ registration.registration_date }}</td>
+
+</tr>
+
+<tr>
+
+<th>Market Value</th>
+
+<td>
+
+₹{{ registration.market_value }}
+
+</td>
+
+</tr>
+
+</table>
+
+</div>
+
+</div>
+
+<div class="card shadow">
+
+<div class="card-header">
+
+Timeline
+
+</div>
+
+<div class="card-body">
+
+{% for item in timeline %}
+
+<div class="border-bottom pb-3 mb-3">
+
+<h6>
+
+{{ item.activity }}
+
+</h6>
+
+<small class="text-muted">
+
+{{ item.created_at }}
+
+</small>
+
+<p>
+
+{{ item.remarks }}
+
+</p>
+
+</div>
+
+{% empty %}
+
+<p>
+
+No activity yet.
+
+</p>
+
+{% endfor %}
+
+</div>
+
+</div>
+
+</div>
+
+<div class="col-lg-4">
+
+<div class="card shadow mb-4">
+
+<div class="card-header">
+
+Documents
+
+</div>
+
+<div class="card-body">
+
+{% if registration.sale_deed %}
+
+<a href="{{ registration.sale_deed.url }}"
+
+target="_blank"
+
+class="btn btn-success w-100 mb-2">
+
+Sale Deed
+
+</a>
+
+{% endif %}
+
+{% if registration.ec_document %}
+
+<a href="{{ registration.ec_document.url }}"
+
+target="_blank"
+
+class="btn btn-primary w-100 mb-2">
+
+EC
+
+</a>
+
+{% endif %}
+
+{% if registration.tax_receipt %}
+
+<a href="{{ registration.tax_receipt.url }}"
+
+target="_blank"
+
+class="btn btn-warning w-100">
+
+Tax Receipt
+
+</a>
+
+{% endif %}
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+{% endblock %}

@@ -2,7 +2,6 @@ from django.db import models
 from bookings.models import Booking
 from customers.models import Customer
 from accounts.models import User
-from common.services.id_generator import IDGenerator
 
 
 class Registration(models.Model):
@@ -123,15 +122,84 @@ class Registration(models.Model):
     def save(self, *args, **kwargs):
 
         if not self.registration_id:
-
-            self.registration_id = IDGenerator.generate(
-                model=Registration,
-                field="registration_id",
-                prefix="REG"
+            last_registration = (
+                Registration.objects
+                .order_by("-id")
+                .first()
             )
+
+            if last_registration:
+
+                last_id = int(
+                    last_registration.registration_id.replace(
+                        "REG",
+                        ""
+                    )
+                )
+
+                new_id = last_id + 1
+
+            else:
+
+                new_id = 1
+
+            self.registration_id = f"REG{new_id:06d}"
 
         super().save(*args, **kwargs)
 
     def __str__(self):
 
         return self.registration_id
+
+
+class RegistrationTimeline(models.Model):
+
+    registration = models.ForeignKey(
+
+        Registration,
+
+        on_delete=models.CASCADE,
+
+        related_name="timeline",
+
+    )
+
+    activity = models.CharField(
+
+        max_length=200
+
+    )
+
+    remarks = models.TextField(
+
+        blank=True,
+
+        null=True,
+
+    )
+
+    created_by = models.ForeignKey(
+
+        User,
+
+        on_delete=models.SET_NULL,
+
+        null=True,
+
+        blank=True,
+
+    )
+
+    created_at = models.DateTimeField(
+
+        auto_now_add=True
+
+    )
+
+    class Meta:
+
+        ordering = ["-created_at"]
+
+    def __str__(self):
+
+        return f"{self.registration.registration_id} - {self.activity}"

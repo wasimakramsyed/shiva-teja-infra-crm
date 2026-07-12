@@ -8,8 +8,7 @@ from bookings.models import Booking
 from customers.models import Customer
 from payments.models import Payment
 from registrations.models import Registration
-from commissions.models import Commission
-
+from commissions.models import CommissionRecord
 
 class DashboardService:
 
@@ -105,19 +104,19 @@ class DashboardService:
 
             # Commission
             "generated_commissions":
-                Commission.objects.filter(
-                    status="generated"
-                ).count(),
+    CommissionRecord.objects.filter(
+        status="generated"
+    ).count(),
 
-            "approved_commissions":
-                Commission.objects.filter(
-                    status="approved"
-                ).count(),
+"approved_commissions":
+    CommissionRecord.objects.filter(
+        status="approved"
+    ).count(),
 
-            "paid_commissions":
-                Commission.objects.filter(
-                    status="paid"
-                ).count(),
+"paid_commissions":
+    CommissionRecord.objects.filter(
+        status="paid"
+    ).count(),
 
             # Recent Data
             "recent_bookings":

@@ -1,97 +1,276 @@
 from django.db import models
-from common.services.id_generator import IDGenerator
-
-from accounts.models import User
 from bookings.models import Booking
-from customers.models import Customer
+from customers.models import Customer, CustomerProperty
+from projects.models import Project, Plot
 from employees.models import Employee
 from teams.models import Team
+from common.services.id_generator import IDGenerator
+from payments.models import Payment
 
 
-# ==========================================================
-# Commission Policy
-# ==========================================================
+class CommissionRequest(models.Model):
 
-class CommissionPolicy(models.Model):
-
-    GENERATE_AFTER = [
-        ("booking", "Booking"),
-        ("full_payment", "Full Payment"),
-        ("registration", "Registration"),
+    STATUS_CHOICES = [
+        ("ready", "Ready for Commission"),
+        ("processing", "In Progress"),
+        ("generated", "Commission Generated"),
+        ("cancelled", "Cancelled"),
     ]
 
-    policy_id = models.CharField(
-        max_length=20,
+    request_id = models.CharField(
+        max_length=30,
         unique=True,
         blank=True
     )
 
-    policy_name = models.CharField(
-        max_length=100
+    booking = models.OneToOneField(
+        Booking,
+        on_delete=models.CASCADE,
+        related_name="commission_request"
     )
 
-    effective_from = models.DateField()
+    customer = models.ForeignKey(
+        Customer,
+        on_delete=models.CASCADE
+    )
 
-    effective_to = models.DateField(
+    customer_property = models.OneToOneField(
+        CustomerProperty,
+        on_delete=models.CASCADE
+    )
+
+    project = models.ForeignKey(
+        Project,
+        on_delete=models.PROTECT
+    )
+
+    plot = models.ForeignKey(
+        Plot,
+        on_delete=models.PROTECT
+    )
+
+    employee = models.ForeignKey(
+        Employee,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
+    )
+
+    team = models.ForeignKey(
+        Team,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
+    )
+
+    sale_amount = models.DecimalField(
+        max_digits=15,
+        decimal_places=2
+    )
+
+    booking_source = models.CharField(
+        max_length=20
+    )
+
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default="ready"
+    )
+
+    created_by = models.ForeignKey(
+        "accounts.User",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="commission_requests_created"
+    )
+
+    generated_by = models.ForeignKey(
+        "accounts.User",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="commission_requests_generated"
+    )
+
+    remarks = models.TextField(
         blank=True,
         null=True
     )
 
-    employee_percentage = models.DecimalField(
+    generated_at = models.DateTimeField(
+        null=True,
+        blank=True
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def save(self, *args, **kwargs):
+
+        if not self.request_id:
+
+            self.request_id = IDGenerator.generate(
+                model=CommissionRequest,
+                field="request_id",
+                prefix="STI-CR"
+            )
+
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.request_id
+
+class CommissionRecord(models.Model):
+
+    STATUS_CHOICES = [
+        ("generated", "Generated"),
+        ("approved", "Approved"),
+        ("released", "Released"),
+        ("paid", "Paid"),
+        ("cancelled", "Cancelled"),
+    ]
+
+    record_id = models.CharField(
+        max_length=30,
+        unique=True,
+        blank=True,
+        db_index=True,
+    )
+
+    request = models.OneToOneField(
+        "CommissionRequest",
+        on_delete=models.CASCADE,
+        related_name="record"
+    )
+
+    booking = models.ForeignKey(
+        Booking,
+        on_delete=models.PROTECT,
+        related_name="commission_records"
+    )
+
+    customer = models.ForeignKey(
+        Customer,
+        on_delete=models.PROTECT,
+        related_name="commission_records",
+    )
+
+    customer_property = models.ForeignKey(
+        CustomerProperty,
+        on_delete=models.PROTECT,
+        related_name="commission_records",
+    )
+
+    project = models.ForeignKey(
+        Project,
+        on_delete=models.PROTECT,
+        related_name="commission_records"
+    )
+
+    plot = models.ForeignKey(
+        Plot,
+        on_delete=models.PROTECT,
+        related_name="commission_records"
+    )
+
+    sale_amount = models.DecimalField(
+        max_digits=15,
+        decimal_places=2
+    )
+
+    commission_percentage = models.DecimalField(
         max_digits=5,
         decimal_places=2
     )
 
-    team_percentage = models.DecimalField(
-        max_digits=5,
-        decimal_places=2,
-        default=0
-    )
-
-    allow_employee = models.BooleanField(
-        default=True
-    )
-
-    allow_team = models.BooleanField(
-        default=False
-    )
-
-    generate_after = models.CharField(
-        max_length=30,
-        choices=GENERATE_AFTER,
-        default="registration"
+    gross_commission = models.DecimalField(
+        max_digits=15,
+        decimal_places=2
     )
 
     tds_percentage = models.DecimalField(
         max_digits=5,
+        decimal_places=2
+    )
+
+    tds_amount = models.DecimalField(
+        max_digits=15,
+        decimal_places=2
+    )
+
+    other_deduction = models.DecimalField(
+        max_digits=15,
         decimal_places=2,
-        default=10
+        default=0
     )
 
-    gst_applicable = models.BooleanField(
-        default=False
+    net_commission = models.DecimalField(
+        max_digits=15,
+        decimal_places=2
     )
 
-    gst_percentage = models.DecimalField(
-        max_digits=5,
-        decimal_places=2,
-        default=18
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default="generated"
     )
 
-    approval_required = models.BooleanField(
-        default=True
+    remarks = models.TextField(
+        blank=True,
+        null=True
     )
 
-    is_active = models.BooleanField(
-        default=True
-    )
-
-    created_by = models.ForeignKey(
-        User,
+    generated_by = models.ForeignKey(
+        "accounts.User",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        related_name="created_commission_policies"
+        related_name="generated_commission_records"
+    )
+
+    approved_by = models.ForeignKey(
+        "accounts.User",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="approved_commission_records"
+    )
+
+    released_by = models.ForeignKey(
+        "accounts.User",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="released_commission_records"
+    )
+
+    paid_by = models.ForeignKey(
+        "accounts.User",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="paid_commission_records"
+    )
+
+    approved_at = models.DateTimeField(
+        null=True,
+        blank=True
+    )
+
+    released_at = models.DateTimeField(
+        null=True,
+        blank=True
+    )
+
+    paid_at = models.DateTimeField(
+        null=True,
+        blank=True
     )
 
     created_at = models.DateTimeField(
@@ -101,176 +280,90 @@ class CommissionPolicy(models.Model):
     updated_at = models.DateTimeField(
         auto_now=True
     )
-
+    @property
+    def total_allocated_percentage(self):
+        return sum(
+            allocation.percentage
+            for allocation in self.allocations.all()
+        )
+    @property
+    def total_allocated_amount(self):
+        return sum(
+            allocation.net_amount
+            for allocation in self.allocations.all()
+        )
+    class Meta:
+        ordering = ["-created_at"]
     def save(self, *args, **kwargs):
 
-        if not self.policy_id:
+        if not self.record_id:
 
-            self.policy_id = IDGenerator.generate(
-                model=CommissionPolicy,
-                field="policy_id",
-                prefix="POL"
-            )
-
-        if self.is_active:
-
-            CommissionPolicy.objects.exclude(
-                pk=self.pk
-            ).update(
-                is_active=False
+            self.record_id = IDGenerator.generate(
+                model=CommissionRecord,
+                field="record_id",
+                prefix="STI-CMR"
             )
 
         super().save(*args, **kwargs)
 
     def __str__(self):
+        return self.record_id
+    
+class CommissionAllocation(models.Model):
 
-        return self.policy_name
-
-
-# ==========================================================
-# Commission
-# ==========================================================
-
-class Commission(models.Model):
-
-    STATUS_CHOICES = [
-        ("generated", "Generated"),
-        ("approved", "Approved"),
+    PAYMENT_STATUS_CHOICES = [
+        ("pending", "Pending"),
         ("paid", "Paid"),
-        ("cancelled", "Cancelled"),
     ]
 
-    commission_id = models.CharField(
-        max_length=20,
+    allocation_id = models.CharField(
+        max_length=30,
         unique=True,
         blank=True
     )
 
-    booking = models.OneToOneField(
-        Booking,
+    commission = models.ForeignKey(
+        "CommissionRecord",
         on_delete=models.CASCADE,
-        related_name="commission"
-    )
-
-    customer = models.ForeignKey(
-        Customer,
-        on_delete=models.CASCADE,
-        related_name="commissions"
-    )
-
-    policy = models.ForeignKey(
-        CommissionPolicy,
-        on_delete=models.PROTECT,
-        related_name="commissions"
+        related_name="allocations"
     )
 
     employee = models.ForeignKey(
         Employee,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name="commissions"
+        on_delete=models.CASCADE,
+        related_name="commission_allocations"
     )
 
-    team = models.ForeignKey(
-        Team,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name="commissions"
+    percentage = models.DecimalField(
+        max_digits=5,
+        decimal_places=2
     )
 
-    booking_value = models.DecimalField(
+    gross_amount = models.DecimalField(
         max_digits=15,
         decimal_places=2
     )
 
-    # Employee
-
-    employee_percentage = models.DecimalField(
-        max_digits=5,
-        decimal_places=2,
-        default=0
-    )
-
-    employee_gross = models.DecimalField(
+    tds_amount = models.DecimalField(
         max_digits=15,
         decimal_places=2,
         default=0
     )
 
-    employee_tds = models.DecimalField(
+    net_amount = models.DecimalField(
         max_digits=15,
-        decimal_places=2,
-        default=0
+        decimal_places=2
     )
 
-    employee_gst = models.DecimalField(
-        max_digits=15,
-        decimal_places=2,
-        default=0
-    )
-
-    employee_net = models.DecimalField(
-        max_digits=15,
-        decimal_places=2,
-        default=0
-    )
-
-    # Team
-
-    team_percentage = models.DecimalField(
-        max_digits=5,
-        decimal_places=2,
-        default=0
-    )
-
-    team_gross = models.DecimalField(
-        max_digits=15,
-        decimal_places=2,
-        default=0
-    )
-
-    team_tds = models.DecimalField(
-        max_digits=15,
-        decimal_places=2,
-        default=0
-    )
-
-    team_gst = models.DecimalField(
-        max_digits=15,
-        decimal_places=2,
-        default=0
-    )
-
-    team_net = models.DecimalField(
-        max_digits=15,
-        decimal_places=2,
-        default=0
-    )
-
-    status = models.CharField(
+    payment_status = models.CharField(
         max_length=20,
-        choices=STATUS_CHOICES,
-        default="generated"
-    )
-
-    approved_by = models.ForeignKey(
-        User,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name="approved_commissions"
-    )
-
-    approved_at = models.DateTimeField(
-        blank=True,
-        null=True
+        choices=PAYMENT_STATUS_CHOICES,
+        default="pending"
     )
 
     paid_at = models.DateTimeField(
-        blank=True,
-        null=True
+        null=True,
+        blank=True
     )
 
     remarks = models.TextField(
@@ -285,19 +378,78 @@ class Commission(models.Model):
     updated_at = models.DateTimeField(
         auto_now=True
     )
-
+    class Meta:
+        ordering = ["-created_at"]
     def save(self, *args, **kwargs):
 
-        if not self.commission_id:
+        if not self.allocation_id:
 
-            self.commission_id = IDGenerator.generate(
-                model=Commission,
-                field="commission_id",
-                prefix="COM"
+            self.allocation_id = IDGenerator.generate(
+                model=CommissionAllocation,
+                field="allocation_id",
+                prefix="STI-CA"
             )
 
         super().save(*args, **kwargs)
 
     def __str__(self):
+        return f"{self.allocation_id} - {self.employee}"
+class CommissionTimeline(models.Model):
 
-        return self.commission_id
+    timeline_id = models.CharField(
+        max_length=30,
+        unique=True,
+        blank=True
+    )
+
+    commission = models.ForeignKey(
+        CommissionRecord,
+        on_delete=models.CASCADE,
+        related_name="timeline"
+    )
+
+    ACTIVITY_CHOICES = [
+        ("generated", "Generated"),
+        ("approved", "Approved"),
+        ("released", "Released"),
+        ("paid", "Paid"),
+        ("cancelled", "Cancelled"),
+    ]
+
+    activity = models.CharField(
+        max_length=20,
+        choices=ACTIVITY_CHOICES,
+        default="generated"
+    )
+
+    remarks = models.TextField(
+        blank=True,
+        null=True
+    )
+
+    created_by = models.ForeignKey(
+        "accounts.User",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+    class Meta:
+        ordering = ["-created_at"]
+    def save(self, *args, **kwargs):
+
+        if not self.timeline_id:
+
+            self.timeline_id = IDGenerator.generate(
+                model=CommissionTimeline,
+                field="timeline_id",
+                prefix="STI-CT"
+            )
+
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.timeline_id

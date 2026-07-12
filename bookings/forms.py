@@ -74,11 +74,10 @@ class BookingForm(forms.ModelForm):
             ),
 
             "plot": forms.Select(
-                attrs={
-                    "class": "form-select"
-                }
-            ),
-
+    attrs={
+        "class": "form-select no-tom-select"
+    }
+),
             "booked_client_name": forms.TextInput(
                 attrs={
                     "class": "form-control",

@@ -1,0 +1,852 @@
+{% extends "layouts/base.html" %}
+
+{% block content %}
+
+<div class="container-fluid">
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+
+    <div>
+
+        <h2>
+
+            <i class="fas fa-chart-line text-success"></i>
+
+            Commission Reports
+
+        </h2>
+
+        <small class="text-muted">
+
+            Employee, Team and Project Commission Summary
+
+        </small>
+
+    </div>
+
+    <a href="{% url 'reports_home' %}" class="btn btn-outline-secondary">
+
+        <i class="fas fa-arrow-left"></i>
+
+        Back to Reports
+
+    </a>
+
+</div>
+
+<div class="mb-4">
+
+    <a
+        href="{% url 'export_commission_excel' %}"
+        class="btn btn-success">
+
+        <i class="fas fa-file-excel"></i>
+
+        Export Excel
+
+    </a>
+
+    <a
+        href="{% url 'export_commission_pdf' %}"
+        class="btn btn-danger ms-2">
+
+        <i class="fas fa-file-pdf"></i>
+
+        Export PDF
+
+    </a>
+
+</div>
+
+<div class="row mb-4">
+
+<div class="card shadow mb-4">
+
+<div class="card-header bg-light">
+
+<h5 class="mb-0">
+
+Employee Commission Summary
+
+</h5>
+
+</div>
+<div class="card shadow mb-4">
+
+<div class="card-header bg-light">
+
+<h5 class="mb-0">
+
+Team Commission Summary
+
+</h5>
+
+</div>
+
+<div class="card-body table-responsive">
+
+<table class="table table-bordered">
+
+<thead class="table-secondary">
+
+<tr>
+
+<th>Team</th>
+
+<th>Records</th>
+
+<th>Gross</th>
+
+<th>TDS</th>
+
+<th>Net</th>
+
+<div class="card shadow mb-4">
+
+    <div class="card-header bg-light">
+
+        <h5 class="mb-0">
+
+            Project Commission Summary
+
+        </h5>
+
+    </div>
+
+    <div class="card-body table-responsive">
+
+        <table class="table table-bordered">
+
+            <thead class="table-secondary">
+
+                <tr>
+
+                    <th>Project</th>
+
+                    <th>Records</th>
+
+                    <th>Gross</th>
+
+                    <th>TDS</th>
+
+                    <th>Net</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                {% for project in project_summary %}
+
+                <tr>
+
+                    <td>
+
+                        {{ project.project__project_name }}
+
+                    </td>
+
+                    <td>
+
+                        {{ project.total }}
+
+                    </td>
+
+                    <td>
+
+                        ₹{{ project.gross|floatformat:2 }}
+
+                    </td>
+
+                    <td>
+
+                        ₹{{ project.tds|floatformat:2 }}
+
+                    </td>
+
+                    <td>
+
+                        <strong>
+
+                            ₹{{ project.net|floatformat:2 }}
+
+                        </strong>
+
+                    </td>
+
+                </tr>
+
+                {% empty %}
+
+                <tr>
+
+                    <td colspan="5" class="text-center">
+
+                        No Project Data
+
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+{% for team in team_summary %}
+
+<tr>
+
+<td>
+
+{{ team.request__team__team_name|default:"No Team" }}
+
+</td>
+
+<td>
+
+{{ team.total }}
+
+</td>
+
+<td>
+
+₹{{ team.gross|floatformat:2 }}
+
+</td>
+
+<td>
+
+₹{{ team.tds|floatformat:2 }}
+
+</td>
+
+<td>
+
+<strong>
+
+₹{{ team.net|floatformat:2 }}
+
+</strong>
+
+</td>
+
+</tr>
+
+{% empty %}
+
+<tr>
+
+<td colspan="5" class="text-center">
+
+No Team Data
+
+</td>
+
+</tr>
+
+{% endfor %}
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+<div class="card-body table-responsive">
+
+<table class="table table-bordered">
+
+<thead class="table-secondary">
+
+<tr>
+
+<th>Employee</th>
+
+<th>Total Records</th>
+
+<th>Gross</th>
+
+<th>TDS</th>
+
+<th>Net</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+{% for emp in employee_summary %}
+
+<tr>
+
+<td>
+
+{{ emp.request__employee__employee_name|default:"No Employee" }}
+
+</td>
+
+<td>
+
+{{ emp.total }}
+
+</td>
+
+<td>
+
+₹{{ emp.gross|floatformat:2 }}
+
+</td>
+
+<td>
+
+₹{{ emp.tds|floatformat:2 }}
+
+</td>
+
+<td>
+
+<strong>
+
+₹{{ emp.net|floatformat:2 }}
+
+</strong>
+
+</td>
+
+</tr>
+
+{% empty %}
+
+<tr>
+
+<td colspan="5" class="text-center">
+
+No Data Found
+
+</td>
+
+</tr>
+
+{% endfor %}
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+ 
+
+<!-- ADD THIS ENTIRE FILTER CARD HERE -->
+
+<div class="card shadow mb-4">
+
+<div class="card-header">
+
+<h5 class="mb-0">
+
+Filters
+
+</h5>
+
+</div>
+
+
+<div class="card-body">
+
+<form method="GET">
+
+<div class="row mb-3">
+
+    <div class="col-md-3">
+
+        <label class="form-label">
+
+            Customer
+
+        </label>
+
+        <input
+            type="text"
+            name="customer"
+            class="form-control"
+            placeholder="Customer Name"
+            value="{{ customer }}">
+
+    </div>
+
+    <div class="col-md-3">
+
+        <label class="form-label">
+
+            Employee
+
+        </label>
+
+        <select
+            name="employee"
+            class="form-select">
+
+            <option value="">All Employees</option>
+
+            {% for emp in employees %}
+
+            <option
+                value="{{ emp.id }}"
+                {% if selected_employee == emp.id|stringformat:"s" %}selected{% endif %}>
+
+                {{ emp.employee_name }}
+
+            </option>
+
+            {% endfor %}
+
+        </select>
+
+    </div>
+
+    <div class="col-md-3">
+
+        <label class="form-label">
+
+            Team
+
+        </label>
+
+        <select
+            name="team"
+            class="form-select">
+
+            <option value="">All Teams</option>
+
+            {% for team in teams %}
+
+            <option
+                value="{{ team.id }}"
+                {% if selected_team == team.id|stringformat:"s" %}selected{% endif %}>
+
+                {{ team.team_name }}
+
+            </option>
+
+            {% endfor %}
+
+        </select>
+
+    </div>
+
+    <div class="col-md-3">
+
+        <label class="form-label">
+
+            Project
+
+        </label>
+
+        <select
+            name="project"
+            class="form-select">
+
+            <option value="">All Projects</option>
+
+            {% for project in projects %}
+
+            <option
+                value="{{ project.id }}"
+                {% if selected_project == project.id|stringformat:"s" %}selected{% endif %}>
+
+                {{ project.project_name }}
+
+            </option>
+            {% endfor %}
+
+        </select>
+
+    </div>
+<div class="row">
+
+    <div class="col-md-3">
+
+        <label class="form-label">
+
+            From Date
+
+        </label>
+
+        <input
+            type="date"
+            name="from_date"
+            class="form-control"
+            value="{{ from_date }}">
+
+    </div>
+
+    <div class="col-md-3">
+
+        <label class="form-label">
+
+            To Date
+
+        </label>
+
+        <input
+            type="date"
+            name="to_date"
+            class="form-control"
+            value="{{ to_date }}">
+
+    </div>
+
+    <div class="col-md-3">
+
+        <label class="form-label">
+
+            Status
+
+        </label>
+
+        <select
+            name="status"
+            class="form-select">
+
+            <option value="">All Status</option>
+
+            <option value="generated"
+                {% if selected_status == "generated" %}selected{% endif %}>
+                Generated
+            </option>
+
+            <option value="approved"
+                {% if selected_status == "approved" %}selected{% endif %}>
+                Approved
+            </option>
+
+            <option value="paid"
+                {% if selected_status == "paid" %}selected{% endif %}>
+                Paid
+            </option>
+
+        </select>
+
+    </div>
+
+    <div class="col-md-3 d-grid">
+
+        <label class="form-label">&nbsp;</label>
+
+        <button class="btn btn-primary">
+
+            <i class="fas fa-search"></i>
+
+            Search
+
+        </button>
+
+        <a
+            href="{% url 'commission_report' %}"
+            class="btn btn-outline-secondary mt-2">
+
+            Reset
+
+        </a>
+
+    </div>
+
+</div>
+</div>
+
+</div>
+</form>
+
+<!-- END OF FILTER CARD -->
+
+<div class="card shadow mb-4">
+
+    <div class="card-header bg-light">
+
+        <h5 class="mb-0">
+
+            Project Commission Summary
+
+        </h5>
+
+    </div>
+
+    <div class="card-body table-responsive">
+
+        <table class="table table-bordered">
+
+            <thead class="table-secondary">
+
+                <tr>
+
+                    <th>Project</th>
+
+                    <th>Records</th>
+
+                    <th>Gross</th>
+
+                    <th>TDS</th>
+
+                    <th>Net</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                {% for project in project_summary %}
+
+                <tr>
+
+                    <td>
+
+                        {{ project.project__project_name }}
+
+                    </td>
+
+                    <td>
+
+                        {{ project.total }}
+
+                    </td>
+
+                    <td>
+
+                        ₹{{ project.gross|floatformat:2 }}
+
+                    </td>
+
+                    <td>
+
+                        ₹{{ project.tds|floatformat:2 }}
+
+                    </td>
+
+                    <td>
+
+                        <strong>
+
+                            ₹{{ project.net|floatformat:2 }}
+
+                        </strong>
+
+                    </td>
+
+                </tr>
+
+                {% empty %}
+
+                <tr>
+
+                    <td colspan="5" class="text-center">
+
+                        No Project Data
+
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+<div class="card shadow">
+
+<div class="card-header">
+ 
+<h5 class="mb-0">
+
+Commission Records
+
+</h5>
+
+</div>
+
+<div class="card-body table-responsive">
+
+<table class="table table-hover align-middle">
+
+<thead class="table-dark">
+
+<tr>
+
+<th>Commission ID</th>
+<th>Booking</th>
+
+<th>Customer</th>
+
+<th>Project</th>
+<th>Employee</th>
+
+<th>Team</th>
+<th>Gross</th>
+
+<th>TDS</th>
+
+<th>Net</th>
+
+<th>Status</th>
+
+<th>Action</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+{% for commission in records %}
+
+<tr>
+
+<td>
+
+{{ commission.record_id }}
+
+</td>
+
+<td>
+
+{{ commission.booking.booking_id }}
+
+</td>
+
+<td>
+
+{{ commission.customer.customer_name }}
+
+</td>
+
+<td>
+
+{{ commission.project.project_name }}
+
+</td>
+<td>
+
+{{ commission.request.employee|default:"-" }}
+
+</td>
+
+<td>
+
+{{ commission.request.team|default:"-" }}
+
+</td>
+<td>
+
+₹{{ commission.gross_commission }}
+
+</td>
+
+<td>
+
+₹{{ commission.tds_amount }}
+
+</td>
+
+<td>
+
+<strong>
+
+₹{{ commission.net_commission }}
+
+</strong>
+
+</td>
+
+<td>
+
+{% if commission.status == "generated" %}
+
+<span class="badge bg-primary">
+
+Generated
+
+</span>
+
+{% elif commission.status == "approved" %}
+
+<span class="badge bg-warning text-dark">
+
+Approved
+
+</span>
+
+{% elif commission.status == "paid" %}
+
+<span class="badge bg-success">
+
+Paid
+
+</span>
+
+{% endif %}
+
+</td>
+
+<td>
+
+<a
+
+href="{% url 'commission_profile' commission.id %}"
+
+class="btn btn-sm btn-outline-primary">
+
+View
+
+</a>
+
+</td>
+
+</tr>
+
+{% empty %}
+
+<tr>
+
+<td colspan="11" class="text-center">
+
+No Commission Records Found
+
+</td>
+
+</tr>
+
+{% endfor %}
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</div>
+
+{% endblock %}

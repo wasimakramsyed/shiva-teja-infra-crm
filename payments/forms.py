@@ -6,7 +6,14 @@ from bookings.models import Booking
 class PaymentForm(forms.ModelForm):
 
     booking = forms.ModelChoiceField(
-        queryset=Booking.objects.all(),
+        queryset=Booking.objects.filter(
+            pending_amount__gt=0
+        ).exclude(
+            status="cancelled"
+        ).select_related(
+            "project",
+            "plot"
+        ),
         empty_label="Select Booking",
         widget=forms.Select(
             attrs={
@@ -16,9 +23,9 @@ class PaymentForm(forms.ModelForm):
     )
 
     class Meta:
+
         model = Payment
 
-        # Fields user should fill
         fields = [
             "booking",
             "payment_date",
@@ -39,7 +46,7 @@ class PaymentForm(forms.ModelForm):
             "amount": forms.NumberInput(
                 attrs={
                     "class": "form-control",
-                    "placeholder": "Enter Amount"
+                    "placeholder": "Enter Payment Amount"
                 }
             ),
 
@@ -56,6 +63,7 @@ class PaymentForm(forms.ModelForm):
                     "placeholder": "Remarks (Optional)"
                 }
             ),
+
         }
 
     def __init__(self, *args, **kwargs):
@@ -64,27 +72,28 @@ class PaymentForm(forms.ModelForm):
 
         super().__init__(*args, **kwargs)
 
-    # Booking dropdown
         self.fields["booking"].label_from_instance = (
-            lambda obj: (
-                f"{obj.booking_id} | "
-                f"{obj.booked_client_name} | "
-                f"{obj.project.project_name} | "
-                f"Plot {obj.plot.plot_number}"
+            lambda obj:
+            f"{obj.booking_id} | "
+            f"{obj.booked_client_name} | "
+            f"{obj.project.project_name} | "
+            f"Plot {obj.plot.plot_number}"
         )
-    )
 
-    # Force payment mode choices
         self.fields["payment_mode"].choices = Payment.PAYMENT_MODE_CHOICES
 
-    # Labels
         self.fields["booking"].label = "Booking"
         self.fields["payment_date"].label = "Payment Date"
         self.fields["amount"].label = "Payment Amount"
         self.fields["payment_mode"].label = "Payment Mode"
         self.fields["remarks"].label = "Remarks"
 
-    # Auto-select booking
         if booking_id:
+
+            self.fields["booking"].queryset = Booking.objects.filter(
+                id=booking_id
+            )
+
             self.fields["booking"].initial = booking_id
+
             self.fields["booking"].disabled = True

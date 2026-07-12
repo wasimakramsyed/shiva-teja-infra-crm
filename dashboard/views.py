@@ -7,8 +7,7 @@ from leads.models import Lead
 from customers.models import Customer
 from bookings.models import Booking
 from payments.models import Payment
-from commissions.models import Commission
-
+from commissions.models import CommissionRecord
 from dashboard.services.dashboard_service import DashboardService
 
 
@@ -113,8 +112,8 @@ def accounts_dashboard(request):
             DashboardService.get_dashboard_data()["total_revenue"],
 
         "pending_commissions":
-            Commission.objects.filter(
-                status="generated"
+            CommissionRecord.objects.filter(
+            status="generated"
             ).count(),
 
         "recent_payments":

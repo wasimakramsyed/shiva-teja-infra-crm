@@ -2,128 +2,150 @@
 
 {% block content %}
 
-<h2>Customer Profile</h2>
+<div class="container-fluid">
 
-<hr>
+    <div class="card shadow-sm mb-4">
 
- 
-<div class="card shadow-sm p-4">
+        <div class="card-body">
 
-    <p><strong>Customer ID:</strong> {{ customer.customer_id }}</p>
-    <p><strong>Name:</strong> {{ customer.customer_name }}</p>
-    <p><strong>Mobile:</strong> {{ customer.mobile_number }}</p>
-    <p><strong>Email:</strong> {{ customer.email }}</p>
-    <p><strong>Address:</strong> {{ customer.address }}</p>
+            <h3 class="mb-3">
 
-    <hr>
+                {{ customer.customer_name }}
 
-    <h4>Booking Details</h4>
+            </h3>
 
-    <p><strong>Booking ID:</strong> {{ customer.booking.booking_id }}</p>
-    <p><strong>Project:</strong> {{ customer.booking.project.project_name }}</p>
-    <p><strong>Plot:</strong> {{ customer.booking.plot.plot_number }}</p>
+            <div class="row">
 
-    <hr>
+                <div class="col-md-6">
 
-    <h4>Registration</h4>
+                    <p><strong>Customer ID :</strong> {{ customer.customer_id }}</p>
 
-    <p><strong>Status:</strong> {{ customer.registration_status }}</p>
-    <p><strong>Date:</strong> {{ customer.registration_date }}</p>
+                    <p><strong>Mobile :</strong> {{ customer.mobile_number }}</p>
 
-    <hr>
+                    <p><strong>Email :</strong> {{ customer.email|default:"-" }}</p>
 
-    <h4>Ownership</h4>
+                </div>
 
-    <p><strong>Status:</strong> {{ customer.ownership_status }}</p>
+                <div class="col-md-6">
 
-    <hr>
-<hr>
+                    <p><strong>Alternative Mobile :</strong> {{ customer.alternative_number|default:"-" }}</p>
 
-<h4>Payment Summary</h4>
+                    <p><strong>Nominee :</strong> {{ customer.nominee_name|default:"-" }}</p>
 
-<table class="table table-bordered">
+                    <p><strong>Relationship :</strong> {{ customer.relationship|default:"-" }}</p>
 
-    <tr>
-        <th>Booking Amount</th>
-        <td>₹{{ booking.booking_amount }}</td>
-    </tr>
+                </div>
 
-    <tr>
-        <th>Total Paid</th>
-        <td>₹{{ total_paid }}</td>
-    </tr>
+            </div>
 
-    <tr>
-        <th>Pending Amount</th>
-        <td>₹{{ pending }}</td>
-    </tr>
+            <hr>
 
-</table>
-    <h4>Payment History</h4>
+            <p>
 
-    {% for payment in payments %}
-        <p>
-            {{ payment.payment_id }} -
-            ₹{{ payment.amount }} -
-            {{ payment.status }}
-        </p>
-    {% empty %}
-        <p>No payments found</p>
-    {% endfor %}
+                <strong>Address</strong>
+
+            </p>
+
+            <p>
+
+                {{ customer.address|default:"-" }}
+
+            </p>
+
+        </div>
+
+    </div>
+
+    <div class="card shadow-sm">
+
+        <div class="card-header">
+
+            <h4 class="mb-0">
+
+                Properties Owned
+
+            </h4>
+
+        </div>
+
+        <div class="card-body">
+
+            <table class="table table-bordered table-hover">
+
+                <thead>
+
+                    <tr>
+
+                        <th>Property ID</th>
+
+                        <th>Project</th>
+
+                        <th>Plot</th>
+
+                        <th>Sale Amount</th>
+
+                        <th>Paid</th>
+
+                        <th>Pending</th>
+
+                        <th>Commission</th>
+
+                        <th>Registration</th>
+
+                        <th>Ownership</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                {% for property in properties %}
+
+                    <tr>
+
+                        <td>{{ property.property_id }}</td>
+
+                        <td>{{ property.project.project_name }}</td>
+
+                        <td>{{ property.plot.plot_number }}</td>
+
+                        <td>₹{{ property.sale_amount }}</td>
+
+                        <td>₹{{ property.paid_amount }}</td>
+
+                        <td>₹{{ property.pending_amount }}</td>
+
+                        <td>{{ property.commission_status }}</td>
+
+                        <td>{{ property.registration_status }}</td>
+
+                        <td>{{ property.ownership_status }}</td>
+
+                    </tr>
+
+                {% empty %}
+
+                    <tr>
+
+                        <td colspan="9" class="text-center">
+
+                            No Properties Found
+
+                        </td>
+
+                    </tr>
+
+                {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
 
 </div>
-<hr>
-
-<h4>Commission Details</h4>
-
-{% if commission %}
-
-<table class="table table-bordered">
-
-    <tr>
-        <th>Commission ID</th>
-        <td>{{ commission.commission_id }}</td>
-    </tr>
-
-    <tr>
-        <th>Status</th>
-        <td>{{ commission.status }}</td>
-    </tr>
-
-    <tr>
-        <th>Employee</th>
-        <td>
-
-            {% if commission.employee %}
-                {{ commission.employee.first_name }}
-                {{ commission.employee.surname }}
-            {% else %}
-                -
-            {% endif %}
-
-        </td>
-    </tr>
-
-    <tr>
-        <th>Employee Net</th>
-        <td>₹{{ commission.employee_net }}</td>
-    </tr>
-
-    <tr>
-        <th>Team Net</th>
-        <td>₹{{ commission.team_net }}</td>
-    </tr>
-
-</table>
-
-{% else %}
-
-<div class="alert alert-info">
-
-    Commission not generated yet.
-
-</div>
-
-{% endif %}
 
 {% endblock %}

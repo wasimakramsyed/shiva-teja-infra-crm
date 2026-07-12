@@ -1,0 +1,195 @@
+<div class="card shadow mb-4">
+
+    <div class="card-header">
+
+        <h5 class="mb-0">
+
+            Commission Details
+
+        </h5>
+
+    </div>
+
+    <div class="card-body">
+
+        <div class="row">
+
+            <div class="col-md-4">
+
+                <div class="form-floating mb-3">
+
+                    {{ form.commission_percentage }}
+
+                    <label>
+                        Commission %
+                    </label>
+
+                </div>
+
+            </div>
+
+            <div class="col-md-4">
+
+                <div class="form-floating mb-3">
+
+                    {{ form.tds_percentage }}
+
+                    <label>
+                        TDS %
+                    </label>
+
+                </div>
+
+            </div>
+
+            <div class="col-md-4">
+
+                <div class="form-floating mb-3">
+
+                    {{ form.other_deduction }}
+
+                    <label>
+                        Other Deduction
+                    </label>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="mb-3">
+
+            {{ form.remarks.label_tag }}
+
+            {{ form.remarks }}
+
+        </div>
+
+    </div>
+
+</div>
+
+<div class="card shadow">
+
+    <div class="card-header">
+
+        <h5 class="mb-0">
+
+            Financial Summary
+
+        </h5>
+
+    </div>
+
+    <div class="card-body">
+
+        <table class="table table-borderless">
+
+            <tr>
+
+                <th width="40%">
+                    Sale Amount
+                </th>
+
+                <td id="summarySaleAmount">
+
+                    ₹ {{ request_obj.sale_amount }}
+
+                </td>
+
+            </tr>
+
+            <tr>
+
+                <th>
+
+                    Gross Commission
+
+                </th>
+
+                <td id="grossCommission">
+
+                    ₹0.00
+
+                </td>
+
+            </tr>
+
+            <tr>
+
+                <th>
+
+                    TDS
+
+                </th>
+
+                <td id="tdsAmount">
+
+                    ₹0.00
+
+                </td>
+
+            </tr>
+
+            <tr>
+
+                <th>
+
+                    Other Deduction
+
+                </th>
+
+                <td id="summaryDeduction">
+
+                    ₹0.00
+
+                </td>
+
+            </tr>
+
+            <tr class="table-success">
+
+                <th>
+
+                    Net Commission
+
+                </th>
+
+                <td
+                    id="netCommission"
+                    class="fw-bold">
+
+                    ₹0.00
+
+                </td>
+
+            </tr>
+
+        </table>
+
+    </div>
+
+</div>
+
+<div class="d-flex justify-content-between mt-4">
+
+    <button
+        type="button"
+        class="btn btn-secondary"
+        onclick="previousStep()">
+
+        ← Previous
+
+    </button>
+
+    <button
+        type="button"
+        class="btn btn-primary"
+        onclick="nextStep()">
+
+        Next →
+
+    </button>
+
+</div>

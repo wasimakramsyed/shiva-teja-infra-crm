@@ -85,9 +85,12 @@ class Project(models.Model):
                 Plot.objects.create(
                     project=self,
                     plot_number=f"P{i:03d}",
+                    block="A",
+                    plot_type="residential",
                     plot_size="Not Assigned",
                     facing="Not Assigned",
-                    status='available'
+                    plot_price=0,
+                    status="available"
                 )
 
     def __str__(self):
@@ -95,20 +98,43 @@ class Project(models.Model):
 
 
 class Plot(models.Model):
+
     STATUS_CHOICES = [
-        ('available', 'Available'),
-        ('booked', 'Booked'),
-        ('registered', 'Registered'),
+        ("available", "Available"),
+        ("booked", "Booked"),
+        ("sold", "Sold"),
+        ("registered", "Registered"),
+        ("cancelled", "Cancelled"),
+    ]
+
+    PLOT_TYPE_CHOICES = [
+        ("residential", "Residential"),
+        ("commercial", "Commercial"),
+        ("villa", "Villa"),
+        ("farm_land", "Farm Land"),
+        ("industrial", "Industrial"),
     ]
 
     project = models.ForeignKey(
         Project,
         on_delete=models.CASCADE,
-        related_name='plots'
+        related_name="plots"
     )
 
     plot_number = models.CharField(
         max_length=50
+    )
+
+    block = models.CharField(
+        max_length=50,
+        blank=True,
+        null=True
+    )
+
+    plot_type = models.CharField(
+        max_length=30,
+        choices=PLOT_TYPE_CHOICES,
+        default="residential"
     )
 
     plot_size = models.CharField(
@@ -121,14 +147,29 @@ class Plot(models.Model):
         default="Not Assigned"
     )
 
+    plot_price = models.DecimalField(
+        max_digits=15,
+        decimal_places=2,
+        default=0
+    )
+
     status = models.CharField(
         max_length=20,
         choices=STATUS_CHOICES,
-        default='available'
+        default="available"
+    )
+
+    remarks = models.TextField(
+        blank=True,
+        null=True
     )
 
     created_at = models.DateTimeField(
         auto_now_add=True
+    )
+
+    updated_at = models.DateTimeField(
+        auto_now=True
     )
 
     def __str__(self):

@@ -1,0 +1,48 @@
+.card{
+    border:none;
+    border-radius:12px;
+}
+
+.card-header{
+    font-weight:600;
+}
+
+.table th{
+    background:#f8f9fa;
+}
+
+.summary-card{
+
+    border-left:5px solid #198754;
+
+}
+
+.summary-danger{
+
+    border-left:5px solid #dc3545;
+
+}
+
+.summary-warning{
+
+    border-left:5px solid #ffc107;
+
+}
+
+.summary-success{
+
+    border-left:5px solid #198754;
+
+}
+
+input[type=number]{
+
+    text-align:right;
+
+}
+
+#generateBtn{
+
+    min-width:220px;
+
+}

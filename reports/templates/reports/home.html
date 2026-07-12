@@ -2,135 +2,357 @@
 
 {% block content %}
 
-<h2 class="mb-4">Reports Dashboard</h2>
+<div class="container-fluid">
 
-<div class="row">
+    <div class="d-flex justify-content-between align-items-center mb-4">
 
-    <!-- Total Sales -->
-    <div class="col-md-4 mb-3">
-        <div class="card shadow-sm">
-            <div class="card-body">
-                <h5>Total Sales</h5>
-                <h2>{{ total_sales }}</h2>
-            </div>
+        <div>
+
+            <h2>
+                <i class="fas fa-chart-bar text-primary"></i>
+                Reports Dashboard
+            </h2>
+
+            <small class="text-muted">
+                View analytics, exports and business reports
+            </small>
+
         </div>
+
     </div>
 
-    <!-- Total Revenue -->
-    <div class="col-md-4 mb-3">
-        <div class="card shadow-sm">
-            <div class="card-body">
-                <h5>Total Revenue</h5>
-                <h2>₹{{ total_revenue }}</h2>
+    <!-- Summary Cards -->
+
+    <div class="row">
+
+        <div class="col-md-4 mb-3">
+
+            <div class="card shadow-sm border-start border-success border-4">
+
+                <div class="card-body">
+
+                    <h6>Total Sales</h6>
+
+                    <h3>{{ total_sales }}</h3>
+
+                </div>
+
             </div>
+
         </div>
+
+        <div class="col-md-4 mb-3">
+
+            <div class="card shadow-sm border-start border-primary border-4">
+
+                <div class="card-body">
+
+                    <h6>Total Revenue</h6>
+
+                    <h3>₹{{ total_revenue }}</h3>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-4 mb-3">
+
+            <div class="card shadow-sm border-start border-warning border-4">
+
+                <div class="card-body">
+
+                    <h6>Pending Commissions</h6>
+
+                    <h3>{{ pending_commissions }}</h3>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-6 mb-3">
+
+            <div class="card shadow-sm border-start border-info border-4">
+
+                <div class="card-body">
+
+                    <h6>Booked Plots</h6>
+
+                    <h3>{{ booked_plots }}</h3>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-6 mb-3">
+
+            <div class="card shadow-sm border-start border-dark border-4">
+
+                <div class="card-body">
+
+                    <h6>Registered Plots</h6>
+
+                    <h3>{{ registered_plots }}</h3>
+
+                </div>
+
+            </div>
+
+        </div>
+
     </div>
 
-    <!-- Pending Commissions -->
-    <div class="col-md-4 mb-3">
-        <div class="card shadow-sm">
-            <div class="card-body">
-                <h5>Pending Commissions</h5>
-                <h2>{{ pending_commissions }}</h2>
-            </div>
+    <hr>
+
+    <h4 class="mb-3">
+
+        <i class="fas fa-folder-open"></i>
+
+        Report Modules
+
+    </h4>
+
+    <div class="row">
+
+        <div class="col-md-3 mb-3">
+
+            <a href="{% url 'booking_report' %}" class="btn btn-outline-primary w-100 py-4">
+
+                <i class="fas fa-file-signature fa-2x"></i>
+
+                <br><br>
+
+                Booking Reports
+
+            </a>
+
         </div>
+
+        <div class="col-md-3 mb-3">
+
+            <a href="{% url 'payment_report' %}" class="btn btn-outline-success w-100 py-4">
+
+                <i class="fas fa-money-bill-wave fa-2x"></i>
+
+                <br><br>
+
+                Payment Reports
+
+            </a>
+
+        </div>
+
+        <div class="col-md-3 mb-3">
+
+            <a href="{% url 'registration_report' %}" class="btn btn-outline-info w-100 py-4">
+
+                <i class="fas fa-file-contract fa-2x"></i>
+
+                <br><br>
+
+                Registration Reports
+
+            </a>
+
+        </div>
+
+        <div class="col-md-3 mb-3">
+
+            <a href="{% url 'commission_report' %}" class="btn btn-outline-warning w-100 py-4">
+
+                <i class="fas fa-hand-holding-usd fa-2x"></i>
+
+                <br><br>
+
+                Commission Reports
+
+            </a>
+
+        </div>
+
+        <div class="col-md-3 mb-3">
+
+            <a href="{% url 'customer_report' %}" class="btn btn-outline-secondary w-100 py-4">
+
+                <i class="fas fa-user-check fa-2x"></i>
+
+                <br><br>
+
+                Customer Reports
+
+            </a>
+
+        </div>
+
+        <div class="col-md-3 mb-3">
+
+            <a href="{% url 'employee_report' %}" class="btn btn-outline-dark w-100 py-4">
+
+                <i class="fas fa-users fa-2x"></i>
+
+                <br><br>
+
+                Employee Reports
+
+            </a>
+
+        </div>
+
+        <div class="col-md-3 mb-3">
+
+            <a href="{% url 'project_report' %}" class="btn btn-outline-danger w-100 py-4">
+
+                <i class="fas fa-city fa-2x"></i>
+
+                <br><br>
+
+                Project Reports
+
+            </a>
+
+        </div>
+
     </div>
 
-    <!-- Booked Plots -->
-    <div class="col-md-6 mb-3">
-        <div class="card border-warning shadow-sm">
-            <div class="card-body">
-                <h5>Booked Plots</h5>
-                <h2>{{ booked_plots }}</h2>
-            </div>
-        </div>
+    <hr>
+
+    <h4>
+
+        <i class="fas fa-download"></i>
+
+        Export Center
+
+    </h4>
+
+    <div class="mb-4">
+
+        <a href="{% url 'export_bookings_csv' %}" class="btn btn-success me-2">
+
+            <i class="fas fa-file-csv"></i>
+
+            Bookings CSV
+
+        </a>
+
+        <a href="{% url 'export_payments_csv' %}" class="btn btn-primary me-2">
+
+            <i class="fas fa-file-csv"></i>
+
+            Payments CSV
+
+        </a>
+
+        <a href="{% url 'export_bookings_pdf' %}" class="btn btn-danger">
+
+            <i class="fas fa-file-pdf"></i>
+
+            Bookings PDF
+
+        </a>
+
     </div>
 
-    <!-- Registered Plots -->
-    <div class="col-md-6 mb-3">
-        <div class="card border-primary shadow-sm">
-            <div class="card-body">
-                <h5>Registered Plots</h5>
-                <h2>{{ registered_plots }}</h2>
+    <hr>
+
+    <div class="row">
+
+        <div class="col-lg-6 mb-4">
+
+            <div class="card shadow">
+
+                <div class="card-header">
+
+                    Revenue Analytics
+
+                </div>
+
+                <div class="card-body">
+
+                    <canvas id="revenueChart"></canvas>
+
+                </div>
+
             </div>
+
         </div>
+
+        <div class="col-lg-6 mb-4">
+
+            <div class="card shadow">
+
+                <div class="card-header">
+
+                    Booking Status
+
+                </div>
+
+                <div class="card-body">
+
+                    <canvas id="bookingChart"></canvas>
+
+                </div>
+
+            </div>
+
+        </div>
+
     </div>
 
-</div>
-
-<hr>
-
-<!-- Export Section -->
-<h4>Exports</h4>
-
-<div class="mt-3 mb-4">
-
-    <a href="/reports/export/bookings/"
-       class="btn btn-success me-2">
-        Export Bookings CSV
-    </a>
-
-    <a href="/reports/export/payments/"
-       class="btn btn-primary me-2">
-        Export Payments CSV
-    </a>
-
-    <a href="/reports/export/bookings/pdf/"
-       class="btn btn-danger">
-        Export Bookings PDF
-    </a>
-
-</div>
-
-<hr>
-
-<!-- Revenue Chart -->
-<h4 class="mt-4">Revenue Analytics</h4>
-
-<div class="card shadow-sm p-3 mb-4">
-    <canvas id="revenueChart"></canvas>
-</div>
-
-<!-- Booking Chart -->
-<h4>Booking Status Analytics</h4>
-
-<div class="card shadow-sm p-3">
-    <canvas id="bookingChart"></canvas>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
-    const totalRevenue = Number("{{ total_revenue|default:'0' }}");
-    const bookedPlots = Number("{{ booked_plots|default:'0' }}");
-    const registeredPlots = Number("{{ registered_plots|default:'0' }}");
 
-    // Revenue Chart
-    const revenueCtx = document.getElementById('revenueChart');
+const totalRevenue = Number("{{ total_revenue|default:'0' }}");
 
-    new Chart(revenueCtx, {
-        type: 'bar',
-        data: {
-            labels: ['Revenue'],
-            datasets: [{
-                label: 'Total Revenue',
-                data: [totalRevenue]
-            }]
-        }
-    });
+const bookedPlots = Number("{{ booked_plots|default:'0' }}");
 
-    // Booking Status Chart
-    const bookingCtx = document.getElementById('bookingChart');
+const registeredPlots = Number("{{ registered_plots|default:'0' }}");
 
-    new Chart(bookingCtx, {
-        type: 'pie',
-        data: {
-            labels: ['Booked', 'Registered'],
-            datasets: [{
-                data: [bookedPlots, registeredPlots]
-            }]
-        }
-    });
+new Chart(document.getElementById('revenueChart'),{
+
+type:'bar',
+
+data:{
+
+labels:['Revenue'],
+
+datasets:[{
+
+label:'Revenue',
+
+data:[totalRevenue]
+
+}]
+
+}
+
+});
+
+new Chart(document.getElementById('bookingChart'),{
+
+type:'pie',
+
+data:{
+
+labels:['Booked','Registered'],
+
+datasets:[{
+
+data:[bookedPlots,registeredPlots]
+
+}]
+
+}
+
+});
+
 </script>
 
 {% endblock %}

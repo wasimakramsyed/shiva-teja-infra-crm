@@ -1,0 +1,275 @@
+<div class="card shadow">
+
+    <div class="card-header bg-light">
+
+        <div class="d-flex justify-content-between align-items-center">
+
+            <div>
+
+                <h5 class="mb-0">
+                    Commission Allocation
+                </h5>
+
+                <small class="text-muted">
+                    Allocate the commission among employees.
+                </small>
+
+            </div>
+
+            <button
+                type="button"
+                id="autoSplitBtn"
+                class="btn btn-outline-primary btn-sm">
+
+                Auto Split
+
+            </button>
+
+        </div>
+
+    </div>
+
+    <div class="card-body">
+
+        <!-- Net Commission -->
+
+        <div class="alert alert-primary">
+
+            <div class="row">
+
+                <div class="col-md-6">
+
+                    <strong>
+
+                        Net Commission
+
+                    </strong>
+
+                </div>
+
+                <div class="col-md-6 text-end">
+
+                    <h4
+                        id="allocationNetAmount"
+                        class="mb-0">
+
+                        ₹0.00
+
+                    </h4>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        {% if request_obj.team %}
+
+            {% for member in members %}
+
+            <div class="card mb-3 border">
+
+                <div class="card-body">
+
+                    <div class="row align-items-center">
+
+                        <!-- Employee -->
+
+                        <div class="col-md-4">
+
+                            <h6 class="mb-1">
+
+                                {{ member.employee.employee_name }}
+
+                            </h6>
+
+                            <small class="text-muted">
+
+                                {{ member.employee.employee_id }}
+
+                            </small>
+
+                        </div>
+
+                        <!-- Percentage -->
+
+                        <div class="col-md-3">
+
+                            <label class="form-label">
+
+                                Allocation %
+
+                            </label>
+
+                            <input
+    type="number"
+    class="form-control allocation"
+    name="allocation_{{ member.employee.id }}"
+    min="0"
+    max="100"
+    step="0.01"
+    value="0"
+    data-employee="{{ member.employee.id }}">
+
+                        </div>
+
+                        <!-- Amount -->
+
+                        <div class="col-md-5 text-end">
+
+                            <label class="form-label">
+
+                                Commission Amount
+
+                            </label>
+
+                            <h5
+                                class="text-success mb-0"
+                                id="employeeAmount{{ member.employee.id }}">
+
+                                ₹0.00
+
+                            </h5>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            {% endfor %}
+
+        {% else %}
+
+            <div class="card border-success">
+
+                <div class="card-body">
+
+                    <div class="row align-items-center">
+
+                        <div class="col-md-6">
+
+                            <h5>
+
+                                {{ request_obj.employee.employee_name }}
+
+                            </h5>
+
+                            <small class="text-muted">
+
+                                {{ request_obj.employee.employee_id }}
+
+                            </small>
+
+                        </div>
+
+                        <div class="col-md-3 text-center">
+
+                            <h4 class="text-primary">
+
+                                100%
+
+                            </h4>
+
+                        </div>
+
+                        <div class="col-md-3 text-end">
+
+                            <h4
+                                class="text-success"
+                                id="singleEmployeeAmount">
+
+                                ₹0.00
+
+                            </h4>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        {% endif %}
+
+
+        <!-- Summary -->
+
+        <div class="card mt-4 bg-light">
+
+            <div class="card-body">
+
+                <div class="row">
+
+                    <div class="col-md-6">
+
+                        <h5>
+
+                            Total Allocation
+
+                        </h5>
+
+                    </div>
+
+                    <div class="col-md-6 text-end">
+
+                        <h3
+                            id="allocationTotal"
+                            class="text-danger">
+
+                            0%
+
+                        </h3>
+
+                    </div>
+
+                </div>
+
+                <hr>
+
+                <div
+                    id="allocationMessage"
+                    class="text-danger fw-bold">
+
+                    Allocation must equal exactly 100%.
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Navigation -->
+
+        <div class="d-flex justify-content-between mt-4">
+
+            <button
+                type="button"
+                class="btn btn-secondary"
+                onclick="previousStep()">
+
+                ← Previous
+
+            </button>
+
+            <button
+                type="button"
+                id="allocationNext"
+                class="btn btn-primary"
+                disabled
+                onclick="nextStep()">
+
+                Next →
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>

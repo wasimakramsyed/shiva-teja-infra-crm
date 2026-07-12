@@ -4,52 +4,354 @@
 
 <div class="container-fluid">
 
-    <div class="card shadow">
+    <!-- ======================================== -->
+    <!-- Page Header -->
+    <!-- ======================================== -->
 
-        <div class="card-header bg-primary text-white">
+    <div class="d-flex justify-content-between align-items-center mb-4">
 
-            <h3>Create Booking</h3>
+        <div>
+
+            {% if form.instance.pk %}
+
+            <h2 class="fw-bold">
+
+                <i class="fas fa-edit text-warning"></i>
+
+                Update Booking
+
+            </h2>
+
+            <p class="text-muted">
+
+                Booking ID :
+                <strong>{{ form.instance.booking_id }}</strong>
+
+            </p>
+
+            {% else %}
+
+            <h2 class="fw-bold">
+
+                <i class="fas fa-file-signature text-primary"></i>
+
+                Create Booking
+
+            </h2>
+
+            <p class="text-muted">
+
+                Register a new customer booking.
+
+            </p>
+
+            {% endif %}
 
         </div>
 
-        <div class="card-body">
+        <div>
 
-            <form method="POST" enctype="multipart/form-data">
+            <a
+                href="{% url 'booking_list' %}"
+                class="btn btn-outline-secondary"
+            >
 
-                {% csrf_token %}
+                <i class="fas fa-arrow-left"></i>
 
-                {% if form.errors %}
+                Back
 
-                <div class="alert alert-danger">
+            </a>
 
-                    <strong>Please correct the following errors</strong>
+        </div>
 
-                    <hr>
+    </div>
 
-                    {{ form.non_field_errors }}
+    <form method="POST" enctype="multipart/form-data">
 
-                    {% for field in form %}
-                        {% for error in field.errors %}
-                            <div>
-                                <strong>{{ field.label }}</strong> :
-                                {{ error }}
+        {% csrf_token %}
+
+        {% if form.errors %}
+
+        <div class="alert alert-danger shadow-sm">
+
+            <h6 class="mb-2">
+
+                <i class="fas fa-exclamation-circle"></i>
+
+                Please correct the following errors
+
+            </h6>
+
+            <hr>
+
+            {{ form.non_field_errors }}
+
+            {% for field in form %}
+                {% for error in field.errors %}
+                <div>
+
+                    <strong>{{ field.label }}</strong>
+
+                    :
+
+                    {{ error }}
+
+                </div>
+                {% endfor %}
+            {% endfor %}
+
+        </div>
+
+        {% endif %}
+
+        <div class="row">
+
+            <!-- ======================================== -->
+            <!-- LEFT SIDE -->
+            <!-- ======================================== -->
+
+            <div class="col-lg-8">
+
+                <!-- Customer Card -->
+
+                <div class="card shadow-sm border-0 mb-4">
+
+                    <div class="card-header bg-primary text-white">
+
+                        <h5 class="mb-0">
+
+                            <i class="fas fa-user"></i>
+
+                            Customer Information
+
+                        </h5>
+
+                    </div>
+
+                    <div class="card-body">
+
+                        <div class="row">
+
+                            <div class="col-md-6 mb-3">
+
+                                {{ form.lead.label_tag }}
+
+                                {{ form.lead }}
+
                             </div>
-                        {% endfor %}
-                    {% endfor %}
+
+                            <div class="col-md-6 mb-3">
+
+                                {{ form.booking_source.label_tag }}
+
+                                {{ form.booking_source }}
+
+                            </div>
+
+                            <div
+                                class="col-md-6 mb-3"
+                                id="employeeDiv"
+                            >
+
+                                {{ form.assigned_employee.label_tag }}
+
+                                {{ form.assigned_employee }}
+
+                            </div>
+
+                            <div
+                                class="col-md-6 mb-3"
+                                id="teamDiv"
+                            >
+
+                                {{ form.assigned_team.label_tag }}
+
+                                {{ form.assigned_team }}
+
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+
+                                {{ form.booked_client_name.label_tag }}
+
+                                {{ form.booked_client_name }}
+
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+
+                                {{ form.mobile_number.label_tag }}
+
+                                {{ form.mobile_number }}
+
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+
+                                {{ form.booking_date.label_tag }}
+
+                                {{ form.booking_date }}
+
+                            </div>
+
+                        </div>
+
+                    </div>
 
                 </div>
 
-                {% endif %}
+            </div>
+
+            <!-- ======================================== -->
+            <!-- RIGHT SIDE -->
+            <!-- ======================================== -->
+
+            <div class="col-lg-4">
+
+                <div class="card shadow-sm border-0">
+
+                    <div class="card-header bg-success text-white">
+
+                        <h5 class="mb-0">
+
+                            <i class="fas fa-chart-line"></i>
+
+                            Booking Summary
+
+                        </h5>
+
+                    </div>
+
+                    <div class="card-body">
+
+                        <table class="table table-borderless">
+
+                            <tr>
+
+                                <th>Booking ID</th>
+
+                                <td>
+
+                                    {% if form.instance.pk %}
+
+                                        {{ form.instance.booking_id }}
+
+                                    {% else %}
+
+                                        Auto Generated
+
+                                    {% endif %}
+
+                                </td>
+
+                            </tr>
+
+                            <tr>
+
+                                <th>Status</th>
+
+                                <td>
+
+                                    {% if form.instance.pk %}
+
+                                        <span class="badge bg-info">
+
+                                            {{ form.instance.get_status_display }}
+
+                                        </span>
+
+                                    {% else %}
+
+                                        <span class="badge bg-primary">
+
+                                            New Booking
+
+                                        </span>
+
+                                    {% endif %}
+
+                                </td>
+
+                            </tr>
+
+                            <tr>
+
+                                <th>Booking Amount</th>
+
+                                <td id="summaryAmount">
+
+                                    ₹0
+
+                                </td>
+
+                            </tr>
+
+                            <tr>
+
+                                <th>Advance</th>
+
+                                <td id="summaryAdvance">
+
+                                    ₹0
+
+                                </td>
+
+                            </tr>
+
+                            <tr>
+
+                                <th>Pending</th>
+
+                                <td
+                                    id="summaryPending"
+                                    class="fw-bold text-danger"
+                                >
+
+                                    ₹0
+
+                                </td>
+
+                            </tr>
+
+                        </table>
+
+                        <div
+                            class="alert alert-info mb-0 mt-3"
+                        >
+
+                            <i class="fas fa-lightbulb"></i>
+
+                            Pending amount updates automatically while entering values.
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
 
                 <!-- ========================= -->
-<!-- Customer -->
-<!-- ========================= -->
+                <!-- Property -->
+                <!-- ========================= -->
 
-<div class="card mb-4">
+                <!-- ======================================== -->
+<!-- Property Information -->
+<!-- ======================================== -->
 
-    <div class="card-header">
+<div class="card shadow-sm border-0 mb-4">
 
-        <h5>👤 Customer Information</h5>
+    <div class="card-header bg-success text-white">
+
+        <h5 class="mb-0">
+
+            <i class="fas fa-map-marker-alt"></i>
+
+            Property Information
+
+        </h5>
 
     </div>
 
@@ -59,57 +361,17 @@
 
             <div class="col-md-6 mb-3">
 
-                {{ form.lead.label_tag }}
+                {{ form.project.label_tag }}
 
-                {{ form.lead }}
-
-            </div>
-
-            <div class="col-md-6 mb-3">
-
-                {{ form.booking_source.label_tag }}
-
-                {{ form.booking_source }}
-
-            </div>
-
-            <div class="col-md-6 mb-3" id="employeeDiv">
-
-                {{ form.assigned_employee.label_tag }}
-
-                {{ form.assigned_employee }}
-
-            </div>
-
-            <div class="col-md-6 mb-3" id="teamDiv">
-
-                {{ form.assigned_team.label_tag }}
-
-                {{ form.assigned_team }}
+                {{ form.project }}
 
             </div>
 
             <div class="col-md-6 mb-3">
 
-                {{ form.booked_client_name.label_tag }}
+                {{ form.plot.label_tag }}
 
-                {{ form.booked_client_name }}
-
-            </div>
-
-            <div class="col-md-6 mb-3">
-
-                {{ form.mobile_number.label_tag }}
-
-                {{ form.mobile_number }}
-
-            </div>
-
-            <div class="col-md-6 mb-3">
-
-                {{ form.booking_date.label_tag }}
-
-                {{ form.booking_date }}
+                {{ form.plot }}
 
             </div>
 
@@ -120,182 +382,196 @@
 </div>
 
                 <!-- ========================= -->
-                <!-- Property -->
-                <!-- ========================= -->
-
-                <div class="card mb-4">
-
-                    <div class="card-header">
-
-                        <h5>🏡 Property Information</h5>
-
-                    </div>
-
-                    <div class="card-body">
-
-                        <div class="row">
-
-                            <div class="col-md-6 mb-3">
-
-                                {{ form.project.label_tag }}
-
-                                {{ form.project }}
-
-                            </div>
-
-                            <div class="col-md-6 mb-3">
-
-                                {{ form.plot.label_tag }}
-
-                                {{ form.plot }}
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-                <!-- ========================= -->
                 <!-- Payment -->
                 <!-- ========================= -->
 
-                <div class="card mb-4">
+                <!-- ======================================== -->
+<!-- Payment Information -->
+<!-- ======================================== -->
 
-                    <div class="card-header">
+<div class="card shadow-sm border-0 mb-4">
 
-                        <h5>💰 Payment Information</h5>
+    <div class="card-header bg-warning">
 
-                    </div>
+        <h5 class="mb-0">
 
-                    <div class="card-body">
+            <i class="fas fa-wallet"></i>
 
-                        <div class="row">
+            Payment Information
 
-                            <div class="col-md-4 mb-3">
+        </h5>
 
-                                {{ form.booking_amount.label_tag }}
+    </div>
 
-                                {{ form.booking_amount }}
+    <div class="card-body">
 
-                            </div>
+        <div class="row">
 
-                            <div class="col-md-4 mb-3">
+            <div class="col-md-4 mb-3">
 
-                                {{ form.advance_amount.label_tag }}
+                {{ form.booking_amount.label_tag }}
 
-                                {{ form.advance_amount }}
+                {{ form.booking_amount }}
 
-                            </div>
+            </div>
 
-                            <div class="col-md-4 mb-3">
+            <div class="col-md-4 mb-3">
 
-                                {{ form.payment_mode.label_tag }}
+                {{ form.advance_amount.label_tag }}
 
-                                {{ form.payment_mode }}
+                {{ form.advance_amount }}
 
-                            </div>
+            </div>
 
-                            <div class="col-md-6 mb-3">
+            <div class="col-md-4 mb-3">
 
-                                {{ form.reference_number.label_tag }}
+                {{ form.payment_mode.label_tag }}
 
-                                {{ form.reference_number }}
+                {{ form.payment_mode }}
 
-                            </div>
+            </div>
 
-                            <div class="col-md-6 mb-3">
+            <div class="col-md-6 mb-3">
 
-                                {{ form.booking_remarks.label_tag }}
+                {{ form.reference_number.label_tag }}
 
-                                {{ form.booking_remarks }}
+                {{ form.reference_number }}
 
-                            </div>
+            </div>
 
-                            <div class="col-md-12">
+            <div class="col-md-6 mb-3">
 
-                                {{ form.special_instructions.label_tag }}
+                {{ form.booking_remarks.label_tag }}
 
-                                {{ form.special_instructions }}
+                {{ form.booking_remarks }}
 
-                            </div>
+            </div>
 
-                        </div>
+            <div class="col-md-12">
 
-                    </div>
+                {{ form.special_instructions.label_tag }}
 
-                </div>
+                {{ form.special_instructions }}
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
 
                 <!-- ========================= -->
                 <!-- Documents -->
                 <!-- ========================= -->
 
-                <div class="card mb-4">
+                <!-- ======================================== -->
+<!-- Documents -->
+<!-- ======================================== -->
 
-                    <div class="card-header">
+<div class="card shadow-sm border-0 mb-4">
 
-                        <h5>📁 Documents</h5>
+    <div class="card-header bg-secondary text-white">
 
-                    </div>
+        <h5 class="mb-0">
 
-                    <div class="card-body">
+            <i class="fas fa-folder-open"></i>
 
-                        <div class="row">
+            Documents
 
-                            <div class="col-md-6 mb-3">
+        </h5>
 
-                                {{ form.booking_form.label_tag }}
+    </div>
 
-                                {{ form.booking_form }}
+    <div class="card-body">
 
-                            </div>
+        <div class="row">
 
-                            <div class="col-md-6 mb-3">
+            <div class="col-md-6 mb-3">
 
-                                {{ form.customer_photo.label_tag }}
+                <label class="form-label">
 
-                                {{ form.customer_photo }}
+                    Booking Form
 
-                            </div>
+                </label>
 
-                            <div class="col-md-6 mb-3">
+                {{ form.booking_form }}
 
-                                {{ form.aadhaar.label_tag }}
+            </div>
 
-                                {{ form.aadhaar }}
+            <div class="col-md-6 mb-3">
 
-                            </div>
+                <label class="form-label">
 
-                            <div class="col-md-6 mb-3">
+                    Customer Photo
 
-                                {{ form.pan.label_tag }}
+                </label>
 
-                                {{ form.pan }}
+                {{ form.customer_photo }}
 
-                            </div>
+            </div>
 
-                        </div>
+            <div class="col-md-6 mb-3">
 
-                    </div>
+                <label class="form-label">
 
-                </div>
+                    Aadhaar
 
-                <div class="text-end">
+                </label>
 
-                    <button class="btn btn-success btn-lg">
+                {{ form.aadhaar }}
 
-                        Save Booking
+            </div>
 
-                    </button>
+            <div class="col-md-6 mb-3">
 
-                </div>
+                <label class="form-label">
 
-            </form>
+                    PAN
+
+                </label>
+
+                {{ form.pan }}
+
+            </div>
 
         </div>
 
     </div>
+
+</div>
+                <div class="d-flex justify-content-end gap-2 mt-4">
+
+    <a
+        href="{% url 'booking_list' %}"
+        class="btn btn-outline-secondary"
+    >
+
+        <i class="fas fa-times"></i>
+
+        Cancel
+
+    </a>
+
+    <button
+        class="btn btn-success px-4"
+    >
+
+        {% if form.instance.pk %}
+
+            <i class="fas fa-save"></i>
+
+            Update Booking
+
+        {% else %}
+
+            <i class="fas fa-plus-circle"></i>
+
+            Save Booking
+
+        {% endif %}
+
+    </button>
 
 </div>
 
@@ -409,7 +685,34 @@ if (projectField && plotField) {
     });
 
 }
+const bookingAmount = document.getElementById("id_booking_amount");
+const advanceAmount = document.getElementById("id_advance_amount");
 
+function updateSummary() {
+
+    let total = parseFloat(bookingAmount.value) || 0;
+
+    let advance = parseFloat(advanceAmount.value) || 0;
+
+    let pending = total - advance;
+
+    if (pending < 0)
+        pending = 0;
+
+    document.getElementById("summaryAmount").innerText =
+        "₹" + total.toLocaleString("en-IN");
+
+    document.getElementById("summaryAdvance").innerText =
+        "₹" + advance.toLocaleString("en-IN");
+
+    document.getElementById("summaryPending").innerText =
+        "₹" + pending.toLocaleString("en-IN");
+}
+
+bookingAmount.addEventListener("input", updateSummary);
+advanceAmount.addEventListener("input", updateSummary);
+
+updateSummary();
 </script>
 
 {% endblock %}

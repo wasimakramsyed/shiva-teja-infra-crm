@@ -20,53 +20,100 @@ from accounts.decorators import role_required
 # ==========================================================
 # Booking List
 # ==========================================================
+# ==========================================================
+# Booking List
+# ==========================================================
 @role_required(['admin', 'manager', 'sales'])
 def booking_list(request):
 
-    query = request.GET.get('q', '')
-    status_filter = request.GET.get('status')
+    query = request.GET.get("q", "").strip()
+    status_filter = request.GET.get("status", "").strip()
+    project_filter = request.GET.get("project", "").strip()
 
     bookings = Booking.objects.select_related(
-    "project",
-    "plot",
-    "lead",
-    "assigned_employee",
-    "assigned_team",
-)
+        "project",
+        "plot",
+        "lead",
+        "assigned_employee",
+        "assigned_team",
+    )
+
+    # ----------------------------------
+    # Project Filter
+    # ----------------------------------
+
+    if project_filter:
+
+        bookings = bookings.filter(
+            project_id=project_filter
+        )
+
+    # ----------------------------------
+    # Search
+    # ----------------------------------
 
     if query:
 
         bookings = bookings.filter(
 
-        Q(booking_id__icontains=query) |
+            Q(booking_id__icontains=query) |
 
-        Q(booked_client_name__icontains=query) |
+            Q(booked_client_name__icontains=query) |
 
-        Q(mobile_number__icontains=query) |
+            Q(mobile_number__icontains=query) |
 
-        Q(project__project_name__icontains=query) |
+            Q(project__project_name__icontains=query) |
 
-        Q(plot__plot_number__icontains=query) |
+            Q(plot__plot_number__icontains=query) |
 
-        Q(assigned_employee__first_name__icontains=query) |
+            Q(assigned_employee__first_name__icontains=query) |
 
-        Q(assigned_employee__surname__icontains=query) |
+            Q(assigned_employee__surname__icontains=query) |
 
-        Q(assigned_team__team_name__icontains=query)
+            Q(assigned_team__team_name__icontains=query)
 
-    ).distinct()
+        ).distinct()
+
+    # ----------------------------------
+    # Status Filter
+    # ----------------------------------
 
     if status_filter:
-        bookings = bookings.filter(status=status_filter)
+
+        bookings = bookings.filter(
+            status=status_filter
+        )
+
+    # ----------------------------------
+    # Load Projects for Dropdown
+    # ----------------------------------
+
+    from projects.models import Project
+
+    projects = Project.objects.order_by(
+        "project_name"
+    )
 
     return render(
+
         request,
-        'bookings/booking_list.html',
+
+        "bookings/booking_list.html",
+
         {
-            'bookings': bookings,
-            'query': query,
-            'status_filter': status_filter
+
+            "bookings": bookings,
+
+            "projects": projects,
+
+            "query": query,
+
+            "status_filter": status_filter,
+
+            "project_filter": project_filter,
+
         }
+
     )
 
 
@@ -232,23 +279,34 @@ def edit_booking(request, booking_id):
 # ==========================================================
 def load_plots(request):
 
-    project_id = request.GET.get('project_id')
+    project_id = request.GET.get("project_id")
+
+    print("=" * 60)
+    print("PROJECT ID RECEIVED:", project_id)
 
     plots = Plot.objects.filter(
         project_id=project_id,
-        status='available'
-    ).values(
-        'id',
-        'plot_number'
-    ).order_by(
-        'plot_number'
+        status="available"
     )
+
+    print("AVAILABLE PLOTS:", plots.count())
+
+    for plot in plots:
+        print(
+            f"ID={plot.id}, "
+            f"Plot={plot.plot_number}, "
+            f"Status={plot.status}"
+        )
 
     return JsonResponse(
-        list(plots),
+        list(
+            plots.values(
+                "id",
+                "plot_number"
+            )
+        ),
         safe=False
     )
-
 # ==========================================================
 # Print Booking
 # ==========================================================

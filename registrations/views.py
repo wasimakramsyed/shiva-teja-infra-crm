@@ -1,17 +1,24 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.core.exceptions import ValidationError
-
-from .models import Registration
-from .forms import RegistrationForm
-
+from django.db.models import Sum
+from django.utils import timezone
+from django.shortcuts import get_object_or_404
 from accounts.decorators import role_required
+
+from customers.models import Customer
+
+from bookings.models import Booking
+
 from notifications.models import Notification
 
-from registrations.services.registration_service import (
-    RegistrationService
-)
+from registrations.forms import RegistrationForm
 
+from registrations.models import Registration
+
+from registrations.services.registration_service import (
+    RegistrationService,
+)
 
 # ==========================================================
 # Registration List
@@ -19,8 +26,26 @@ from registrations.services.registration_service import (
 @role_required(["admin", "manager"])
 def registration_list(request):
 
-    registrations = Registration.objects.select_related(
-        "booking"
+    registrations = (
+
+        Registration.objects
+
+        .select_related(
+
+            "booking",
+
+            "customer",
+
+            "booking__project",
+
+        )
+
+        .order_by(
+
+            "-registration_date"
+
+        )
+
     )
 
     return render(
@@ -49,11 +74,33 @@ def create_registration(request):
 
             try:
 
-                registration = (
-                    RegistrationService.register_property(
-                        form=form,
-                        user=request.user
+                registration = form.save(commit=False)
+
+                registration.created_by = request.user
+
+                # -----------------------------------------
+                # Link Customer Automatically
+                # -----------------------------------------
+
+                customer = Customer.objects.filter(
+                    mobile_number=registration.booking.mobile_number
+                ).first()
+
+                if not customer:
+                    raise ValidationError(
+                        "Customer not found for this booking."
                     )
+
+                registration.customer = customer
+
+                registration.save()
+
+                RegistrationService.register(
+
+                    registration=registration,
+
+                    created_by=request.user,
+
                 )
 
                 Notification.objects.create(
@@ -93,4 +140,98 @@ def create_registration(request):
         {
             "form": form
         }
+    )
+
+
+@role_required(["admin", "accounts", "manager"])
+def registration_dashboard(request):
+
+    today = timezone.now().date()
+
+    context = {
+
+        "total_registrations":
+            Registration.objects.count(),
+
+        "today_registrations":
+            Registration.objects.filter(
+                registration_date=today
+            ).count(),
+
+        "upcoming_registrations":
+            Registration.objects.filter(
+                registration_date__gt=today
+            ).count(),
+
+        "completed_registrations":
+            Registration.objects.count(),
+
+        "pending_registrations":
+            Booking.objects.filter(
+                status="fully_paid"
+            ).exclude(
+                registration__isnull=False
+            ).count(),
+
+        "registration_value":
+            Registration.objects.aggregate(
+                total=Sum("market_value")
+            )["total"] or 0,
+
+        "today_list":
+            Registration.objects.filter(
+                registration_date=today
+            ).select_related(
+                "booking",
+                "customer"
+            ).order_by("registration_date")[:10],
+
+    }
+
+    return render(
+
+        request,
+
+        "registrations/dashboard.html",
+
+        context,
+
+    )
+
+@role_required(["admin", "accounts", "manager"])
+def registration_profile(request, registration_id):
+
+    registration = get_object_or_404(
+
+        Registration.objects.select_related(
+
+            "customer",
+            "booking",
+            "booking__project",
+            "booking__plot",
+
+        ),
+
+        pk=registration_id,
+
+    )
+
+    timeline = registration.timeline.all()
+
+    context = {
+
+        "registration": registration,
+
+        "timeline": timeline,
+
+    }
+
+    return render(
+
+        request,
+
+        "registrations/registration_profile.html",
+
+        context,
+
     )

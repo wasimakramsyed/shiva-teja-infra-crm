@@ -1,0 +1,349 @@
+<script>
+
+let currentStep = 1;
+
+// ==========================================
+// Wizard Navigation
+// ==========================================
+
+function showStep(step){
+
+    document.querySelectorAll(".wizard-step").forEach(function(item){
+        item.style.display = "none";
+    });
+
+    document.getElementById("wizard-step-" + step).style.display = "block";
+
+    currentStep = step;
+
+    updateProgress();
+
+}
+
+function nextStep(){
+
+    if(currentStep < 4){
+
+        if(currentStep === 3){
+
+            updateConfirmation();
+
+        }
+
+        showStep(currentStep + 1);
+
+    }
+
+}
+function previousStep(){
+
+    if(currentStep > 1){
+        showStep(currentStep - 1);
+    }
+
+}
+
+function updateProgress(){
+
+    for(let i=1;i<=4;i++){
+
+        let item=document.getElementById("progress"+i);
+
+        item.classList.remove(
+            "text-primary",
+            "text-success",
+            "fw-bold"
+        );
+
+        item.classList.add("text-muted");
+
+    }
+
+    for(let i=1;i<currentStep;i++){
+
+        let item=document.getElementById("progress"+i);
+
+        item.classList.remove("text-muted");
+
+        item.classList.add(
+            "text-success",
+            "fw-bold"
+        );
+
+    }
+
+    let current=document.getElementById("progress"+currentStep);
+
+    current.classList.remove("text-muted");
+
+    current.classList.add(
+        "text-primary",
+        "fw-bold"
+    );
+
+}
+
+
+
+// ==========================================
+// Commission Calculator
+// ==========================================
+
+function calculateCommission(){
+
+    let saleAmount=parseFloat(
+        "{{ request_obj.sale_amount }}"
+    ) || 0;
+
+    let commissionPercentage=parseFloat(
+        document.getElementById("id_commission_percentage").value
+    ) || 0;
+
+    let tdsPercentage=parseFloat(
+        document.getElementById("id_tds_percentage").value
+    ) || 0;
+
+    let otherDeduction=parseFloat(
+        document.getElementById("id_other_deduction").value
+    ) || 0;
+
+    let gross=
+        saleAmount*commissionPercentage/100;
+
+    let tds=
+        gross*tdsPercentage/100;
+
+    let net=
+        gross-tds-otherDeduction;
+
+    document.getElementById("grossCommission").innerHTML=
+        "₹ "+gross.toLocaleString("en-IN",{minimumFractionDigits:2});
+
+    document.getElementById("tdsAmount").innerHTML=
+        "₹ "+tds.toLocaleString("en-IN",{minimumFractionDigits:2});
+
+    document.getElementById("summaryDeduction").innerHTML=
+        "₹ "+otherDeduction.toLocaleString("en-IN",{minimumFractionDigits:2});
+
+    document.getElementById("netCommission").innerHTML=
+        "₹ "+net.toLocaleString("en-IN",{minimumFractionDigits:2});
+
+    let allocationNet=document.getElementById("allocationNetAmount");
+
+    if(allocationNet){
+
+        allocationNet.innerHTML=
+            "₹ "+net.toLocaleString("en-IN",{minimumFractionDigits:2});
+
+    }
+
+    updateAllocation();
+
+}
+
+
+
+// ==========================================
+// Allocation
+// ==========================================
+
+function updateAllocation(){
+
+    let allocationInputs=document.querySelectorAll(".allocation");
+
+    if(allocationInputs.length===0){
+
+        let single=document.getElementById("singleEmployeeAmount");
+
+        if(single){
+
+            single.innerHTML=
+                document.getElementById("netCommission").innerHTML;
+
+        }
+
+        return;
+
+    }
+
+    let net=parseFloat(
+
+        document.getElementById("netCommission")
+        .innerHTML
+        .replace(/[₹,]/g,"")
+
+    ) || 0;
+
+    let total=0;
+
+    allocationInputs.forEach(function(input){
+
+        let percentage=parseFloat(input.value)||0;
+
+        total+=percentage;
+
+        let amount=
+            net*percentage/100;
+
+        document.getElementById(
+
+            "employeeAmount"+input.dataset.employee
+
+        ).innerHTML=
+
+            "₹ "+amount.toLocaleString(
+
+                "en-IN",
+
+                {
+
+                    minimumFractionDigits:2
+
+                }
+
+            );
+
+    });
+
+    let totalElement=document.getElementById("allocationTotal");
+
+    totalElement.innerHTML=total.toFixed(2)+" %";
+
+    let message=document.getElementById("allocationMessage");
+
+    let next=document.getElementById("allocationNext");
+
+    if(total===100){
+
+        totalElement.className="text-success";
+
+        message.className="text-success fw-bold";
+
+        message.innerHTML="Allocation Complete";
+
+        next.disabled=false;
+
+    }else{
+
+        totalElement.className="text-danger";
+
+        message.className="text-danger fw-bold";
+
+        message.innerHTML="Allocation must equal exactly 100%.";
+
+        next.disabled=true;
+
+    }
+
+}
+
+
+
+// ==========================================
+// Auto Split
+// ==========================================
+
+function autoSplit(){
+
+    let allocationInputs=document.querySelectorAll(".allocation");
+
+    if(allocationInputs.length===0)
+        return;
+
+    let value=100/allocationInputs.length;
+
+    allocationInputs.forEach(function(input){
+
+        input.value=value.toFixed(2);
+
+    });
+
+    updateAllocation();
+
+}
+
+
+
+// ==========================================
+// Events
+// ==========================================
+
+document.addEventListener("DOMContentLoaded",function(){
+
+    showStep(1);
+
+    calculateCommission();
+
+    if(document.getElementById("id_commission_percentage")){
+
+        document.getElementById("id_commission_percentage")
+        .addEventListener("input",calculateCommission);
+
+        document.getElementById("id_tds_percentage")
+        .addEventListener("input",calculateCommission);
+
+        document.getElementById("id_other_deduction")
+        .addEventListener("input",calculateCommission);
+
+    }
+
+    document.querySelectorAll(".allocation")
+    .forEach(function(input){
+
+        input.addEventListener("input",updateAllocation);
+
+    });
+
+    let auto=document.getElementById("autoSplitBtn");
+
+    if(auto){
+
+        auto.addEventListener("click",autoSplit);
+
+    }
+
+});
+function updateConfirmation(){
+
+    document.getElementById("confirmCommissionPercentage").innerHTML =
+        document.getElementById("id_commission_percentage").value + "%";
+
+    document.getElementById("confirmGross").innerHTML =
+        document.getElementById("grossCommission").innerHTML;
+
+    document.getElementById("confirmTDS").innerHTML =
+        document.getElementById("tdsAmount").innerHTML;
+
+    document.getElementById("confirmDeduction").innerHTML =
+        document.getElementById("summaryDeduction").innerHTML;
+
+    document.getElementById("confirmNet").innerHTML =
+        document.getElementById("netCommission").innerHTML;
+
+    let summary = "";
+
+    document.querySelectorAll(".allocation").forEach(function(input){
+
+        let employee =
+            input.closest(".card")
+                 .querySelector("h6")
+                 .innerText;
+
+        let amount =
+            document.getElementById(
+                "employeeAmount"+input.dataset.employee
+            ).innerHTML;
+
+        summary += `
+            <div class="d-flex justify-content-between border-bottom py-2">
+                <span>${employee}</span>
+                <strong>${amount}</strong>
+            </div>
+        `;
+
+    });
+
+    document.getElementById("allocationSummary").innerHTML = summary;
+
+}
+</script>

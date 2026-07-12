@@ -1,0 +1,150 @@
+<div class="card shadow">
+
+    <div class="card-header bg-light">
+
+        <h5 class="mb-0">
+
+            Confirm Commission
+
+        </h5>
+
+    </div>
+
+    <div class="card-body">
+
+        <div class="row">
+
+            <div class="col-md-6">
+
+                <table class="table table-borderless">
+
+                    <tr>
+                        <th>Customer</th>
+                        <td>{{ request_obj.customer.customer_name }}</td>
+                    </tr>
+
+                    <tr>
+                        <th>Project</th>
+                        <td>{{ request_obj.project.project_name }}</td>
+                    </tr>
+
+                    <tr>
+                        <th>Plot</th>
+                        <td>{{ request_obj.plot.plot_number }}</td>
+                    </tr>
+
+                    <tr>
+                        <th>Sale Amount</th>
+                        <td>₹ {{ request_obj.sale_amount }}</td>
+                    </tr>
+
+                </table>
+
+            </div>
+
+            <div class="col-md-6">
+
+                <table class="table table-borderless">
+
+                    <tr>
+
+                        <th>Commission %</th>
+
+                        <td id="confirmCommissionPercentage">
+
+                            0%
+
+                        </td>
+
+                    </tr>
+
+                    <tr>
+
+                        <th>Gross Commission</th>
+
+                        <td id="confirmGross">
+
+                            ₹0.00
+
+                        </td>
+
+                    </tr>
+
+                    <tr>
+
+                        <th>TDS</th>
+
+                        <td id="confirmTDS">
+
+                            ₹0.00
+
+                        </td>
+
+                    </tr>
+
+                    <tr>
+
+                        <th>Other Deduction</th>
+
+                        <td id="confirmDeduction">
+
+                            ₹0.00
+
+                        </td>
+
+                    </tr>
+
+                    <tr class="table-success">
+
+                        <th>Net Commission</th>
+
+                        <td id="confirmNet">
+
+                            ₹0.00
+
+                        </td>
+
+                    </tr>
+
+                </table>
+
+            </div>
+
+        </div>
+
+        <hr>
+
+        <h5>
+
+            Allocation Summary
+
+        </h5>
+
+        <div id="allocationSummary">
+
+        </div>
+
+        <div class="d-flex justify-content-between mt-4">
+
+            <button
+                type="button"
+                class="btn btn-secondary"
+                onclick="previousStep()">
+
+                ← Previous
+
+            </button>
+
+            <button
+                type="submit"
+                class="btn btn-success btn-lg">
+
+                Generate Commission
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>

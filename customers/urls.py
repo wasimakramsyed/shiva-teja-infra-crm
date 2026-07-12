@@ -3,6 +3,7 @@ from .views import (
     customer_list,
     create_customer,
     customer_profile,
+    customer_workspace,
     edit_customer
 )
 
@@ -13,11 +14,11 @@ urlpatterns = [
         name='customer_list'
     ),
 
-    path(
-        'customers/create/',
-        create_customer,
-        name='create_customer'
-    ),
+    # path(
+    #     'customers/create/',
+    #     create_customer,
+    #     name='create_customer'
+    # ),
 
     path(
         'customers/<int:customer_id>/',
@@ -30,4 +31,13 @@ urlpatterns = [
         edit_customer,
         name='edit_customer'
     ),
+    path(
+
+    "customers/<int:customer_id>/workspace/",
+
+    customer_workspace,
+
+    name="customer_workspace",
+
+),
 ]

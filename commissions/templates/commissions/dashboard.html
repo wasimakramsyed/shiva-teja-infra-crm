@@ -1,0 +1,251 @@
+{% extends "layouts/base.html" %}
+
+{% block content %}
+
+<div class="container-fluid">
+
+<h2 class="mb-4">
+
+<i class="fas fa-hand-holding-usd text-success"></i>
+
+Commission Dashboard
+
+</h2>
+
+<div class="row">
+
+<div class="col-md-4">
+
+<div class="card shadow border-start border-primary border-4">
+
+<div class="card-body">
+
+<h6>Generated</h6>
+
+<h2>{{ generated }}</h2>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="col-md-4">
+
+<div class="card shadow border-start border-warning border-4">
+
+<div class="card-body">
+
+<h6>Approved</h6>
+
+<h2>{{ approved }}</h2>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="col-md-4">
+
+<div class="card shadow border-start border-success border-4">
+
+<div class="card-body">
+
+<h6>Paid</h6>
+
+<h2>{{ paid }}</h2>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<br>
+
+<div class="row">
+
+<div class="col-md-4">
+
+<div class="card shadow">
+
+<div class="card-body">
+
+<h6>Pending Requests</h6>
+
+<h3>
+
+{{ pending_requests }}
+
+</h3>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="col-md-4">
+
+<div class="card shadow">
+
+<div class="card-body">
+
+<h6>Total Commission</h6>
+
+<h3>
+
+₹{{ total_commission }}
+
+</h3>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="col-md-4">
+
+<div class="card shadow">
+
+<div class="card-body">
+
+<h6>Pending Payout</h6>
+
+<h3>
+
+₹{{ pending_amount }}
+
+</h3>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<hr>
+
+<div class="d-flex gap-2 mb-3">
+
+<a href="{% url 'commission_request_list' %}"
+
+class="btn btn-primary">
+
+Requests
+
+</a>
+
+<a href="{% url 'commission_list' %}"
+
+class="btn btn-success">
+
+Generated
+
+</a>
+
+<a href="{% url 'reports_home' %}"
+
+class="btn btn-dark">
+
+Reports
+
+</a>
+
+</div>
+
+<div class="card shadow">
+
+<div class="card-header">
+
+Recent Commissions
+
+</div>
+
+<div class="card-body">
+
+<table class="table table-hover">
+
+<thead>
+
+<tr>
+
+<th>ID</th>
+
+<th>Customer</th>
+
+<th>Amount</th>
+
+<th>Status</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+{% for commission in recent %}
+
+<tr>
+
+<td>
+
+<a href="{% url 'commission_profile' commission.id %}">
+
+{{ commission.request.request_id }}
+
+</a>
+
+</td>
+
+<td>
+
+{{ commission.customer.customer_name }}
+
+</td>
+
+<td>
+
+₹{{ commission.net_commission }}
+
+</td>
+
+<td>
+
+{{ commission.get_status_display }}
+
+</td>
+
+</tr>
+
+{% empty %}
+
+<tr>
+
+<td colspan="4">
+
+No commissions available.
+
+</td>
+
+</tr>
+
+{% endfor %}
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</div>
+
+{% endblock %}
