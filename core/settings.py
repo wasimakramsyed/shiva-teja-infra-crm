@@ -13,9 +13,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = config("SECRET_KEY")
 
-DEBUG = config("DEBUG", cast=bool)
-
-ALLOWED_HOSTS = config("ALLOWED_HOSTS").split(",")
+DEBUG = config("DEBUG", default=False, cast=bool)
+ALLOWED_HOSTS = config(
+    "ALLOWED_HOSTS",
+    default="127.0.0.1,localhost"
+).split(",")
 # ======================================================
 # Email Configuration
 # ======================================================
@@ -30,12 +32,22 @@ EMAIL_USE_TLS = True
 
 EMAIL_USE_SSL = False
 
-EMAIL_HOST_USER = config("EMAIL_HOST_USER")
+EMAIL_HOST_USER = config(
+    "EMAIL_HOST_USER",
+    default=""
+)
 
-EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD")
+EMAIL_HOST_PASSWORD = config(
+    "EMAIL_HOST_PASSWORD",
+    default=""
+)
 
-DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL")
+DEFAULT_FROM_EMAIL = config(
+    "DEFAULT_FROM_EMAIL",
+    default=""
+)
 
+ 
 SERVER_EMAIL = DEFAULT_FROM_EMAIL
 # --------------------------------------------------
 # Installed Apps
@@ -116,7 +128,7 @@ DATABASES = {
         "USER": config("DB_USER"),
         "PASSWORD": config("DB_PASSWORD"),
         "HOST": config("DB_HOST"),
-        "PORT": config("DB_PORT"),
+        "PORT": config("DB_PORT", default="5432"),
     }
 }
 
@@ -189,25 +201,19 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # MSG91 SMS Configuration
 # ======================================================
 
-MSG91_AUTH_KEY = config("MSG91_AUTH_KEY")
+MSG91_AUTH_KEY = config(
+    "MSG91_AUTH_KEY",
+    default=""
+)
 
-MSG91_TEMPLATE_ID = config("MSG91_TEMPLATE_ID")
+MSG91_TEMPLATE_ID = config(
+    "MSG91_TEMPLATE_ID",
+    default=""
+)
 
-MSG91_SENDER_ID = config("MSG91_SENDER_ID")
-
-OTP_EXPIRY_MINUTES = config("OTP_EXPIRY_MINUTES", cast=int)
-
-OTP_LENGTH = config("OTP_LENGTH", cast=int)
-
-EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-EMAIL_HOST = "smtp.gmail.com"
-
-EMAIL_PORT = 587
-
-EMAIL_USE_TLS = True
-
-EMAIL_HOST_USER = config("EMAIL_HOST_USER")
-
-EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD")
-
-DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL")
+MSG91_SENDER_ID = config(
+    "MSG91_SENDER_ID",
+    default=""
+)
+ 
+ 
