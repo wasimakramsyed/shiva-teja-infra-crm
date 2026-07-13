@@ -18,6 +18,9 @@ ALLOWED_HOSTS = config(
     "ALLOWED_HOSTS",
     default="127.0.0.1,localhost"
 ).split(",")
+CSRF_TRUSTED_ORIGINS = [
+    "http://shivateja-prod-v2.eba-km3ptqbm.ap-south-2.elasticbeanstalk.com",
+]
 # ======================================================
 # Email Configuration
 # ======================================================
