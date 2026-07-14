@@ -19,8 +19,13 @@ ALLOWED_HOSTS = config(
     default="127.0.0.1,localhost"
 ).split(",")
 CSRF_TRUSTED_ORIGINS = [
-    "http://shivateja-prod-v2.eba-km3ptqbm.ap-south-2.elasticbeanstalk.com",
+    "https://shivateja-prod-v2.eba-km3ptqbm.ap-south-2.elasticbeanstalk.com",
+    "https://shivateja-infra.in",
+    "https://www.shivateja-infra.in",
 ]
+
+USE_X_FORWARDED_HOST = True
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 # ======================================================
 # Email Configuration
 # ======================================================
@@ -236,9 +241,66 @@ CSRF_COOKIE_SECURE = not DEBUG
 
 SESSION_COOKIE_SECURE = not DEBUG
 
+SECURE_SSL_REDIRECT = not DEBUG
+
+SECURE_BROWSER_XSS_FILTER = True
+
+SECURE_CONTENT_TYPE_NOSNIFF = True
+
+X_FRAME_OPTIONS = "DENY"
+
+SECURE_REFERRER_POLICY = "same-origin"
+
+CSRF_COOKIE_HTTPONLY = True
+
+SESSION_COOKIE_HTTPONLY = True
+
 CONN_MAX_AGE = 600
 
 LOGIN_REDIRECT_URL = "/"
 
 LOGOUT_REDIRECT_URL = "/login/"
- 
+# ======================================================
+# Logging Configuration
+# ======================================================
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+
+    "formatters": {
+        "standard": {
+            "format": "[{asctime}] {levelname} {name}: {message}",
+            "style": "{",
+        },
+    },
+
+    "handlers": {
+        "file": {
+            "level": "INFO",
+            "class": "logging.FileHandler",
+            "filename": BASE_DIR / "logs" / "django.log",
+            "formatter": "standard",
+        },
+    },
+
+    "loggers": {
+        "django": {
+            "handlers": ["file"],
+            "level": "INFO",
+            "propagate": True,
+        },
+        "": {
+            "handlers": ["file"],
+            "level": "INFO",
+        },
+    },
+}
+
+SECURE_HSTS_SECONDS = 31536000 if not DEBUG else 0
+
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+
+SECURE_HSTS_PRELOAD = True
+
+EMAIL_TIMEOUT = 30
