@@ -4,7 +4,7 @@ SECRET_KEY=3&xka*@i(n4-q4wccefawx=c67+g3a59728#)wmb$g(rdfahh%
 
 ALLOWED_HOSTS=127.0.0.1,localhost
 
-DB_NAME=stinfra_crm
+DB_NAME=stinfra_crm 
 DB_USER=stinfra_admin
 DB_PASSWORD=shiva-teja
 DB_HOST=localhost
