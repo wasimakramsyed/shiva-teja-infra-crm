@@ -1,0 +1,27 @@
+DEBUG=False
+
+SECRET_KEY=3&xka*@i(n4-q4wccefawx=c67+g3a59728#)wmb$g(rdfahh%
+
+ALLOWED_HOSTS=127.0.0.1,localhost
+
+DB_NAME=stinfra_crm
+DB_USER=stinfra_admin
+DB_PASSWORD=shiva-teja
+DB_HOST=localhost
+DB_PORT=5432
+
+MSG91_AUTH_KEY=
+
+MSG91_TEMPLATE_ID=
+
+MSG91_SENDER_ID=STICRM
+
+OTP_EXPIRY_MINUTES=5
+
+OTP_LENGTH=6
+
+EMAIL_HOST_USER=sujaynamburi@gmail.com
+EMAIL_HOST_PASSWORD=vgij kpnr vfwn lfjq
+DEFAULT_FROM_EMAIL=Shiva Teja Infra CRM <sujaynamburi@gmail.com>
+
+ 
